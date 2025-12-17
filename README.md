@@ -341,67 +341,66 @@ npm run deploy:ipfs   # Deploy to IPFS
 - ✅ Global balance caching (15s TTL)
 - ✅ Reduced API call frequency
 
-## 🧪 Testing
+## E2E Testing Guide
+
+### Overview
+
+E2E tests use **WebdriverIO (WDIO)** with **LambdaTest** cloud execution.
+
+### Environment Setup
+
+Create `.env` in `tests-automation/`:
+
+```ini
+URL_TO_TEST=http://localhost:3000
+PROJECT_NAME=ASI Wallet Tests
+LT_USER_NAME=your_username
+LT_ACCESS_KEY=your_access_key
+LT_API_URL=https://api.lambdatest.com/automation/api/v1
+PRIVATE_KEY=your_test_private_key_here
+```
 
 ### Running Tests
 
 ```bash
-# Run tests in watch mode (development)
-npm test
+# Web/Desktop tests
+npx wdio run wdio.web.conf.js
 
-# Run all tests once
-npm test -- --watchAll=false
-
-# Generate coverage report
-npm test -- --coverage --watchAll=false
-
-# Run specific test file
-npm test Dashboard
-npm test walletSlice
-
-# Run tests matching pattern
-npm test -- --testNamePattern="should persist"
+# Mobile tests
+npx wdio run wdio.mobile.conf.js
 ```
 
-### Test Coverage
+### Test Structure
 
-Current coverage metrics:
-- **Store Modules**: 62.88% (Target: 50%) ✅
-- **Services**: 17.59%
-- **Components**: Varies (Settings: 94.87%)
-
-View detailed coverage report:
-```bash
-npm test -- --coverage --watchAll=false
-# Open coverage/lcov-report/index.html in browser
+```
+tests-automation/
+├── TestSuites/
+│   ├── accounts/
+│   │   ├── deployContract.e2e.test.js
+│   │   └── mainIntegtation.e2e.test.js
+│   ├── connection.test.js
+│   ├── navbar.test.js
+│   ├── network.test.js
+│   └── privateKey.test.js
+├── pages/
+│   ├── AccountsPage.js
+│   ├── BasePage.js
+│   ├── DashboardPage.js
+│   ├── DeployPage.js
+│   ├── HistoryPage.js
+│   ├── NavbarPage.js
+│   ├── NetworkPage.js
+│   ├── ReceivePage.js
+│   └── TransactionsPage.js
+├── wdio.web.conf.js
+├── wdio.mobile.conf.js
+└── .env
 ```
 
-### Testing WalletConnect Integration
+### LambdaTest Dashboard
 
-The project includes a test dApp in the `test-dapp-rchain/` directory for testing WalletConnect functionality:
+View test results: [https://automation.lambdatest.com](https://automation.lambdatest.com)
 
-### Running the Test dApp
-
-```bash
-# Terminal 1: Run the wallet
-cd asi_wallet_v2
-PORT=3002 npm start
-
-# Terminal 2: Run the test dApp
-cd asi_wallet_v2/test-dapp-rchain
-npm install
-npm run dev
-```
-
-The test dApp will be available at http://localhost:3003
-
-### Test dApp Features
-- **Connection Testing**: QR code and URI-based wallet connection
-- **Transaction Testing**: Send test transactions with custom Rholang code
-- **Message Signing**: Test cryptographic message signing
-- **Balance Queries**: Verify balance checking functionality
-
-For detailed usage, see [test-dapp-rchain/README.md](test-dapp-rchain/README.md)
 
 ## 🤝 Contributing
 
