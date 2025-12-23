@@ -1,4 +1,4 @@
-import { type ReactElement, useState } from "react";
+import { type ReactElement, useState, useRef, useEffect } from "react";
 import "./style.css";
 
 export interface ICopyButtonProps {
@@ -52,6 +52,7 @@ const CopiedIcon = ({ iconSize = 24 }: IIconProps): ReactElement => {
 
 const CopyButton = ({ action, dataToCopy, iconSize }: ICopyButtonProps) => {
     const [isCopied, setIsCopied] = useState<boolean>(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const runAction = async () => {
         try {
@@ -65,13 +66,23 @@ const CopyButton = ({ action, dataToCopy, iconSize }: ICopyButtonProps) => {
                 await navigator.clipboard.writeText(dataToCopy ?? "");
             }
 
-            setTimeout(() => setIsCopied(false), 3000);
+            setIsCopied(true);
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+            timeoutRef.current = setTimeout(() => setIsCopied(false), 3000);
         } catch (error) {
             console.error(error);
-        } finally {
-            setIsCopied(true);
         }
     };
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
         <span className="copy-container">
