@@ -40,9 +40,9 @@ const CopiedIcon = ({ iconSize = 24 }: IIconProps): ReactElement => {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className="lucide lucide-check-icon lucide-check"
         >
             <path d="M20 6 9 17l-5-5" />
@@ -62,7 +62,7 @@ const CopyButton = ({ action, dataToCopy, iconSize }: ICopyButtonProps) => {
             if (action) {
                 await action();
             } else {
-                await navigator.clipboard.writeText(dataToCopy || "");
+                await navigator.clipboard.writeText(dataToCopy ?? "");
             }
 
             setTimeout(() => setIsCopied(false), 3000);
