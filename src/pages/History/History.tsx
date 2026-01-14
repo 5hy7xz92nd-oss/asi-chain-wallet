@@ -47,6 +47,16 @@ const FilterSelect = styled.select`
     min-width: 150px;
 `;
 
+const FilterInput = styled.input`
+    padding: 8px 12px;
+    border: 1px solid ${({ theme }) => theme.border};
+    border-radius: 6px;
+    background: ${({ theme }) => theme.surface};
+    color: ${({ theme }) => theme.text.primary};
+    font-size: 14px;
+    min-width: 150px;
+`;
+
 const StatsSection = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -226,7 +236,7 @@ const formatDate = (date: Date): string => {
 
 export const History: React.FC = () => {
     const dispatch = useDispatch();
-    const { selectedAccount, selectedNetwork } = useSelector(
+    const { selectedAccount, selectedNetwork, networks } = useSelector(
         (state: RootState) => state.wallet
     );
     const { unlockedAccounts } = useSelector((state: RootState) => state.auth);
@@ -319,6 +329,25 @@ export const History: React.FC = () => {
             if (filter.status) {
                 filteredTxs = filteredTxs.filter(
                     (tx) => tx.status === filter.status
+                );
+            }
+            if (filter.network) {
+                filteredTxs = filteredTxs.filter(
+                    (tx) => tx.network === filter.network
+                );
+            }
+            if (filter.startDate) {
+                const startDate = new Date(filter.startDate);
+                startDate.setHours(0, 0, 0, 0);
+                filteredTxs = filteredTxs.filter(
+                    (tx) => new Date(tx.timestamp) >= startDate
+                );
+            }
+            if (filter.endDate) {
+                const endDate = new Date(filter.endDate);
+                endDate.setHours(23, 59, 59, 999);
+                filteredTxs = filteredTxs.filter(
+                    (tx) => new Date(tx.timestamp) <= endDate
                 );
             }
 
@@ -416,8 +445,16 @@ export const History: React.FC = () => {
     const handleFilterChange = (key: keyof TransactionFilter, value: any) => {
         setFilter((prev) => ({
             ...prev,
-            [key]: value === "all" ? undefined : value,
+            [key]: value === "all" || value === "" ? undefined : value,
         }));
+    };
+
+    const handleClearFilters = () => {
+        setFilter({});
+    };
+
+    const hasActiveFilters = () => {
+        return !!(filter.type || filter.status || filter.network || filter.startDate || filter.endDate);
     };
 
     return (
@@ -609,6 +646,82 @@ export const History: React.FC = () => {
                                 <option value="failed">Failed</option>
                             </FilterSelect>
                         </FilterGroup>
+
+                        <FilterGroup>
+                            <FilterLabel>
+                                <h4>Network</h4>
+                            </FilterLabel>
+                            <FilterSelect
+                                id="history-filter-network-select"
+                                value={filter.network || "all"}
+                                onChange={(e) =>
+                                    handleFilterChange("network", e.target.value)
+                                }
+                            >
+                                <option value="all">All Networks</option>
+                                {networks.map((network) => (
+                                    <option key={network.id} value={network.name}>
+                                        {network.name}
+                                    </option>
+                                ))}
+                            </FilterSelect>
+                        </FilterGroup>
+
+                        <FilterGroup>
+                            <FilterLabel>
+                                <h4>Start Date</h4>
+                            </FilterLabel>
+                            <FilterInput
+                                id="history-filter-start-date-input"
+                                type="date"
+                                value={filter.startDate ? new Date(filter.startDate).toISOString().split('T')[0] : ""}
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        const dateStr = e.target.value;
+                                        const date = new Date(dateStr + 'T00:00:00');
+                                        handleFilterChange("startDate", date);
+                                    } else {
+                                        handleFilterChange("startDate", undefined);
+                                    }
+                                }}
+                            />
+                        </FilterGroup>
+
+                        <FilterGroup>
+                            <FilterLabel>
+                                <h4>End Date</h4>
+                            </FilterLabel>
+                            <FilterInput
+                                id="history-filter-end-date-input"
+                                type="date"
+                                value={filter.endDate ? new Date(filter.endDate).toISOString().split('T')[0] : ""}
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        const dateStr = e.target.value;
+                                        const date = new Date(dateStr + 'T23:59:59');
+                                        handleFilterChange("endDate", date);
+                                    } else {
+                                        handleFilterChange("endDate", undefined);
+                                    }
+                                }}
+                            />
+                        </FilterGroup>
+
+                        {hasActiveFilters() && (
+                            <FilterGroup>
+                                <FilterLabel>
+                                    <h4>&nbsp;</h4>
+                                </FilterLabel>
+                                <Button
+                                    id="history-clear-filters-button"
+                                    size="small"
+                                    variant="ghost"
+                                    onClick={handleClearFilters}
+                                >
+                                    Clear Filters
+                                </Button>
+                            </FilterGroup>
+                        )}
                     </FilterSection>
 
                     <StatsSection>
