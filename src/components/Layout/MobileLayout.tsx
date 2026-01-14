@@ -262,17 +262,6 @@ const NavLink = styled.button<{ $active: boolean }>`
     }
 `;
 
-const LogoutButton = styled(MobileNavLink)`
-    background: ${({ theme }) => theme.danger};
-    color: white;
-    border-left-color: ${({ theme }) => theme.danger};
-
-    &:hover {
-        background: ${({ theme }) => theme.danger};
-        opacity: 0.8;
-    }
-`;
-
 const Main = styled.main<{ $fullWidth?: boolean }>`
     flex: 1;
     padding: ${({ $fullWidth }) => ($fullWidth ? "0" : "16px")};
@@ -546,20 +535,6 @@ export const MobileLayout: React.FC<LayoutProps> = ({ children }) => {
                             </MobileNavLink>
                         ))}
                     </MobileNavSection>
-
-                    {isAuthenticated && (
-                        <MobileNavSection>
-                            <MobileNavSectionTitle>
-                                Account
-                            </MobileNavSectionTitle>
-                            <LogoutButton
-                                $active={false}
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </LogoutButton>
-                        </MobileNavSection>
-                    )}
                 </MobileNavContent>
             </MobileNavDrawer>
 
