@@ -28,6 +28,7 @@
     "@ledgerhq/hw-transport-webusb": "^6.29.10",
     "@monaco-editor/react": "^4.7.0",
     "@reduxjs/toolkit": "^1.9.5",
+    "@singnet/waf-captcha-frontend": "^0.0.5",
     "@trezor/connect-web": "^9.6.3",
     "@types/blake2b": "^2.1.3",
     "@types/crypto-js": "^4.2.2",
