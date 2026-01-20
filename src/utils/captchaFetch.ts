@@ -1,4 +1,4 @@
-import { createCaptchaFetchHandler } from "@singnet/waf-captcha-frontend";
+import { createCaptchaFetchHandler } from "waf-captcha-frontend";
 
 export const getCaptchaFetch = () => {
     const keys = {

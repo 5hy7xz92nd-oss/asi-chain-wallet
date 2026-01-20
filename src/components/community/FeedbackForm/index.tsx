@@ -1,6 +1,6 @@
 import DropdownList, { OptionType } from "../DropdownList";
 import FeedbackFormTriggerIcon from "../assets/asi-feedback-logo.png";
-import { useState, ReactElement, ChangeEvent } from "react";
+import { Fragment, useState, ReactElement, ChangeEvent } from "react";
 import {
     endpoints,
     FEEDBACK_FORM_SOURCE,
@@ -8,7 +8,7 @@ import {
     MINIMUM_FEEDBACK_TEXT_LENGTH,
 } from "./meta";
 import "./style.css";
-import { getCaptchaFetch } from "utils/captchaKeys";
+import { getCaptchaFetch } from "utils/captchaFetch";
 
 enum FeedbackCategory {
     QUESTION = "question",
@@ -36,7 +36,7 @@ const initialFormFields: TFormFields = {
 const FeedbackForm = (): ReactElement => {
     const [isRequestHandling, setIsRequestHandling] = useState(false);
     const [isRequestSent, setIsRequestSent] = useState(false);
-    const [isFormDisplayed, setIsFormDisplayed] = useState(false);
+    const [isFormDisplayed, setIsFormDisplayed] = useState<boolean>(false);
     const [formFields, setFormFields] =
         useState<TFormFields>(initialFormFields);
 
@@ -137,7 +137,7 @@ const FeedbackForm = (): ReactElement => {
     };
 
     return (
-        <>
+        <Fragment>
             <div id="captchaContainer" />
             <div className="feedback-form-holder">
                 <div
@@ -250,7 +250,7 @@ const FeedbackForm = (): ReactElement => {
                     </button>
                 </div>
             </div>
-        </>
+        </Fragment>
     );
 };
 
