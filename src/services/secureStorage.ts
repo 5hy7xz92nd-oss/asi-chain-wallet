@@ -3,7 +3,7 @@ import { Account } from 'types/wallet';
 
 export interface SecureAccount extends Omit<Account, 'privateKey'> {
   encryptedPrivateKey?: string;
-  privateKey?: never; // Ensure privateKey is nev                                                                                                                                                                                                                                                                                                                    er stored
+  privateKey?: never;
   derivationPath?: string;
   isHardwareWallet?: boolean;
   userId?: string;
@@ -13,22 +13,16 @@ export interface SecureStorageData {
   accounts: SecureAccount[];
   settings: {
     requirePasswordForTransaction: boolean;
-    idleTimeout: number; // in minutes
+    idleTimeout: number;
   };
 }
 
-/**
- * Secure storage service for managing encrypted wallet data
- */
 export class SecureStorage {
   private static readonly STORAGE_KEY = hashValue('asi_wallet_secure_v2');
   private static readonly SESSION_KEY = hashValue('asi_wallet_session_v2');
   private static readonly AUTH_KEY = hashValue('asi_wallet_auth_v2');
   private static readonly USER_ID_KEY = hashValue('asi_wallet_user_id_v2');
 
-  /**
-   * Save encrypted accounts to localStorage
-   */
   static saveEncryptedAccounts(accounts: SecureAccount[]): void {
     try {
       const data = this.getStorageData();
@@ -56,17 +50,23 @@ export class SecureStorage {
     }
   }
 
-  /**
-   * Encrypt and save a new account
-   */
-  static saveAccount(account: Account, password: string, userId?: string): SecureAccount {
+  static saveAccount(account: Account, password: string, userId?: string, profileName?: string): SecureAccount {
     if (!account.privateKey) {
       throw new Error('Private key is required');
     }
 
-    const currentUserId = userId || this.getCurrentUserId();
+    let currentUserId = userId;
     if (!currentUserId) {
-      throw new Error('User ID is required. Please login first.');
+      if (profileName) {
+        currentUserId = this.generateUserIdFromPassword(password, profileName);
+      } else {
+        const existingUserId = this.getCurrentUserId();
+        if (!existingUserId) {
+          currentUserId = this.generateUserIdFromPassword(password, account.name);
+        } else {
+          currentUserId = existingUserId;
+        }
+      }
     }
 
     const encryptedPrivateKey = encrypt(account.privateKey, password);
@@ -198,9 +198,6 @@ export class SecureStorage {
     return this.getEncryptedAccounts(userId).length > 0;
   }
 
-  /**
-   * Get settings from storage
-   */
   static getSettings(): SecureStorageData['settings'] {
     const data = this.getStorageData();
     return data.settings;
@@ -487,7 +484,10 @@ export class SecureStorage {
     }
   }
 
-  static generateUserIdFromPassword(password: string): string {
+  static generateUserIdFromPassword(password: string, profileName?: string): string {
+    if (profileName) {
+      return hashValue(`user_${profileName}_${password}`);
+    }
     return hashValue(`user_${password}`);
   }
 }
