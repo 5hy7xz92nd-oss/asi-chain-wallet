@@ -57,16 +57,11 @@ export class SecureStorage {
 
     let currentUserId = userId;
     if (!currentUserId) {
-      if (profileName) {
-        currentUserId = this.generateUserIdFromPassword(password, profileName);
-      } else {
-        const existingUserId = this.getCurrentUserId();
-        if (!existingUserId) {
-          currentUserId = this.generateUserIdFromPassword(password, account.name);
-        } else {
-          currentUserId = existingUserId;
-        }
+      const nameToUse = profileName || account.name;
+      if (!nameToUse) {
+        throw new Error('Account name is required to generate user ID');
       }
+      currentUserId = this.generateUserIdFromPassword(password, nameToUse);
     }
 
     const encryptedPrivateKey = encrypt(account.privateKey, password);
@@ -96,14 +91,14 @@ export class SecureStorage {
       return null;
     }
 
-    const accounts = this.getEncryptedAccounts(currentUserId);
-    const secureAccount = accounts.find(a => a.id === accountId);
+    const allAccounts = this.getEncryptedAccounts();
+    const secureAccount = allAccounts.find(a => a.id === accountId);
 
     if (!secureAccount?.encryptedPrivateKey) {
       return null;
     }
 
-    if (secureAccount.userId !== currentUserId) {
+    if (secureAccount.userId && secureAccount.userId !== currentUserId) {
       return null;
     }
 

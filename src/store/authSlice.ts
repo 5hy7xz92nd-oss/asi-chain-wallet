@@ -46,13 +46,8 @@ export const createAccountWithPassword = createAsyncThunk(
     const state = getState() as { wallet: { selectedNetwork?: Network } };
     const selectedNetworkId = networkId || state.wallet?.selectedNetwork?.id;
     
-    let userId = SecureStorage.getCurrentUserId();
-    const hadAccountsBefore = userId ? SecureStorage.hasAccounts(userId) : false;
-    
-    if (!userId) {
-      userId = SecureStorage.generateUserIdFromPassword(password, name);
-      SecureStorage.setCurrentUserId(userId);
-    }
+    const userId = SecureStorage.generateUserIdFromPassword(password, name);
+    const hadAccountsBefore = SecureStorage.hasAccounts(userId);
     
     const keyPair = generateKeyPair();
     const account: Account = {
@@ -74,6 +69,8 @@ export const createAccountWithPassword = createAsyncThunk(
     if (!hadAccountsBefore) {
       SecureStorage.setAuthenticated(true);
     }
+
+    SecureStorage.setCurrentUserId(userId);
 
     return { account, isFirstAccount: !hadAccountsBefore };
   }
@@ -117,13 +114,8 @@ export const importAccountWithPassword = createAsyncThunk(
     const state = getState() as { wallet: { selectedNetwork?: Network } };
     const selectedNetworkId = networkId || state.wallet?.selectedNetwork?.id;
     
-    let userId = SecureStorage.getCurrentUserId();
-    const hadAccountsBefore = userId ? SecureStorage.hasAccounts(userId) : false;
-    
-    if (!userId) {
-      userId = SecureStorage.generateUserIdFromPassword(password, name);
-      SecureStorage.setCurrentUserId(userId);
-    }
+    const userId = SecureStorage.generateUserIdFromPassword(password, name);
+    const hadAccountsBefore = SecureStorage.hasAccounts(userId);
     
     let accountData;
     
@@ -166,6 +158,8 @@ export const importAccountWithPassword = createAsyncThunk(
     if (!hadAccountsBefore) {
       SecureStorage.setAuthenticated(true);
     }
+
+    SecureStorage.setCurrentUserId(userId);
 
     return { account, isFirstAccount: !hadAccountsBefore };
   }
@@ -213,12 +207,14 @@ export const loginWithPassword = createAsyncThunk(
 
     for (const accountNameToTry of namesToTry) {
       const userId = SecureStorage.generateUserIdFromPassword(password, accountNameToTry);
-      
-      for (const account of allAccounts) {
-        if (account.userId && account.userId !== userId) {
-          continue;
+      const accountsForThisUser = allAccounts.filter(acc => {
+        if (acc.userId) {
+          return acc.userId === userId;
         }
-        
+        return acc.name === accountNameToTry;
+      });
+      
+      for (const account of accountsForThisUser) {
         const unlocked = SecureStorage.unlockAccount(account.id, password, userId);
         if (unlocked) {
           unlockedAccounts.push(unlocked);
@@ -232,25 +228,6 @@ export const loginWithPassword = createAsyncThunk(
 
       if (foundUserId && unlockedAccounts.length > 0) {
         break;
-      }
-    }
-
-    if (!foundUserId) {
-      const fallbackUserId = SecureStorage.generateUserIdFromPassword(password);
-      for (const account of allAccounts) {
-        if (account.userId && account.userId !== fallbackUserId) {
-          continue;
-        }
-        
-        const unlocked = SecureStorage.unlockAccount(account.id, password, fallbackUserId);
-        if (unlocked) {
-          unlockedAccounts.push(unlocked);
-          foundUserId = fallbackUserId;
-          
-          if (!account.userId) {
-            accountsToMigrate.push(account.id);
-          }
-        }
       }
     }
 
