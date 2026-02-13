@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { RootState } from "store";
 import { RChainService } from "services/rchain";
+import { SecureStorage } from "services/secureStorage";
 import { getGasFeeAsNumber } from "../../constants/gas";
 import {
     Card,
@@ -27,6 +28,23 @@ interface PendingTransaction {
     type: 'send' | 'receive' | 'deploy';
     expectedBalance?: string;
 }
+
+enum DeployResultStatus {
+    Completed = "completed",
+    Errored = "errored",
+    SystemError = "system_error",
+    Pending = "pending",
+    Submitted = "submitted",
+}
+
+type DeployResultData = {
+    status: DeployResultStatus;
+    message?: string;
+    error?: string;
+    blockHash?: string;
+    cost?: string;
+    [key: string]: unknown;
+};
 
 const savePendingTransaction = (tx: PendingTransaction) => {
     if (typeof window === 'undefined' || !window.localStorage) {
@@ -195,8 +213,56 @@ export const Deploy: React.FC = () => {
         setShowDeployConfirmation(true);
     };
 
+    const applyFinalDeployResult = (
+        finalResult: DeployResultData,
+        deployId: string
+    ) => {
+        if (finalResult.status === DeployResultStatus.Completed) {
+            setResult({
+                ...finalResult,
+                deployId,
+                message: `${finalResult.message}`,
+                blockHash: finalResult.blockHash,
+                cost: finalResult.cost,
+            });
+            return;
+        }
+
+        if (finalResult.status === DeployResultStatus.Errored) {
+            setError(`[ERROR] Deploy execution failed: ${finalResult.error}`);
+            return;
+        }
+
+        if (finalResult.status === DeployResultStatus.SystemError) {
+            setError(`[ERROR] System error: ${finalResult.error}`);
+            return;
+        }
+
+        setResult(finalResult);
+    };
+
+    const applyFallbackDeployResult = (deployId: string, err: unknown) => {
+        const msg = err instanceof Error ? err.message : "";
+        const isCorsOrNetwork =
+            msg.includes("CORS") || msg.includes("network");
+
+        setResult({
+            deployId,
+            status: isCorsOrNetwork
+                ? DeployResultStatus.Pending
+                : DeployResultStatus.Submitted,
+            message: isCorsOrNetwork
+                ? "[PENDING] Deploy submitted successfully. Status check unavailable due to CORS/network issues."
+                : "[PENDING] Deploy submitted successfully. It may still be processing or pending block inclusion.",
+        });
+    };
+
     const handleConfirmDeploy = async () => {
         if (!selectedAccount) return;
+        if (!SecureStorage.hasSessionToken()) {
+            setError("Session expired. Please login again.");
+            return;
+        }
 
         const balance = parseFloat(selectedAccount.balance || "0");
         const phloLimitNum = parseInt(phloLimit);
@@ -278,51 +344,10 @@ export const Deploy: React.FC = () => {
             });
 
             try {
-                const finalResult = await rchain.waitForDeployResult(
-                    deployResult
-                );
-
-                if (finalResult.status === "completed") {
-                    setResult({
-                        ...finalResult,
-                        deployId: deployResult,
-                        message: `${finalResult.message}`,
-                        blockHash: finalResult.blockHash,
-                        cost: finalResult.cost,
-                    });
-                } else if (finalResult.status === "errored") {
-                    setError(
-                        `[ERROR] Deploy execution failed: ${finalResult.error}`
-                    );
-                } else if (finalResult.status === "system_error") {
-                    setError(`[ERROR] System error: ${finalResult.error}`);
-                } else {
-                    setResult(finalResult);
-                }
-            } catch (resultError: any) {
-                console.log("Could not fetch deploy result:", resultError);
-
-                // Check if it's a CORS or network error
-                if (
-                    resultError.message &&
-                    (resultError.message.includes("CORS") ||
-                        resultError.message.includes("network"))
-                ) {
-                    setResult({
-                        deployId: deployResult,
-                        status: "pending",
-                        message:
-                            "[PENDING] Deploy submitted successfully. Status check unavailable due to CORS/network issues.",
-                    });
-                } else {
-                    // Set a basic success result since we got a deploy ID
-                    setResult({
-                        deployId: deployResult,
-                        status: "submitted",
-                        message:
-                            "[PENDING] Deploy submitted successfully. It may still be processing or pending block inclusion.",
-                    });
-                }
+                const finalResult = await rchain.waitForDeployResult(deployResult);
+                applyFinalDeployResult(finalResult, deployResult);
+            } catch (resultError: unknown) {
+                applyFallbackDeployResult(deployResult, resultError);
             }
         } catch (err: any) {
             setError(err.message || "Deploy failed");
