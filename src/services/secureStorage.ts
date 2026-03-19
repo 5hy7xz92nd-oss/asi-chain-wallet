@@ -76,6 +76,7 @@ const DEFAULT_SETTINGS: SecureStorageData['settings'] = {
 
 export class SecureStorage {
   private static readonly STORAGE_KEY = hashValue('asi_wallet_secure_v2');
+  private static readonly MIGRATION_FLAG_KEY = hashValue('asi_wallet_migration_from_localStorage_v1');
 
   private static readonly SESSION_KEY       = SESSION_STORAGE_KEYS.SESSION;
   private static readonly AUTH_KEY          = SESSION_STORAGE_KEYS.AUTH;
@@ -83,7 +84,6 @@ export class SecureStorage {
   private static readonly SESSION_TOKEN_KEY = SESSION_STORAGE_KEYS.SESSION_TOKEN;
 
   private static sessionPort: SessionPersistencePort = NullSessionPersistence;
-
   private static cache: SecureStorageData = SecureStorage.readLocalStorage();
   private static initialized = false;
   private static initPromise: Promise<void> | null = null;
@@ -118,25 +118,24 @@ export class SecureStorage {
     }
   }
 
-  private static async migrateFromLocalStorage(adapter: StorageAdapter): Promise<void> {
+  private static async migrateAccountsToIDB(adapter: StorageAdapter): Promise<void> {
     const existingAccounts = await adapter.getAllAccounts();
-    if (existingAccounts.length > 0) {
-      return;
-    }
-
+    if (existingAccounts.length > 0) return;
     const lsData = this.readLocalStorage();
-    if (lsData.accounts.length === 0) {
+    if (lsData.accounts.length === 0) return;
+    await adapter.putAccounts(lsData.accounts.map(toStoredRecord));
+    await adapter.putSettings({ id: 'default', ...lsData.settings });
+  }
+
+  private static async migrateFromLocalStorage(adapter: StorageAdapter): Promise<void> {
+    const flag = await adapter.getItem(this.MIGRATION_FLAG_KEY);
+    if (flag === 'true') {
       return;
     }
 
-    const records = lsData.accounts.map(toStoredRecord);
-    await adapter.putAccounts(records);
-    await adapter.putSettings({
-      id: 'default',
-      ...lsData.settings,
-    });
+    await this.migrateAccountsToIDB(adapter);
+    await adapter.setItem(this.MIGRATION_FLAG_KEY, 'true');
 
-    console.info('[SecureStorage] Migrated localStorage data to IndexedDB');
     localStorage.removeItem(this.STORAGE_KEY);
   }
 
@@ -645,10 +644,7 @@ export class SecureStorage {
     const adapter = StorageProvider.getAdapter();
     if (adapter) {
       const idbValue = await adapter.getItem(hashedKey);
-      if (idbValue !== null) {
-        return idbValue;
-      }
-      // Fallback: check localStorage for data not yet migrated
+      if (idbValue !== null) return idbValue;
       return localStorage.getItem(hashedKey);
     }
     return localStorage.getItem(hashedKey);
