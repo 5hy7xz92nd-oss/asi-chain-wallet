@@ -10,6 +10,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const ButtonBase = styled.button<ButtonProps>`
   display: inline-flex;
+  gap: .5rem;
   align-items: center;
   justify-content: center;
   font-weight: 500;
@@ -18,10 +19,11 @@ const ButtonBase = styled.button<ButtonProps>`
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  border: none;
+  border: 2px solid ${({ theme }) => theme.primary};
   outline: none;
   text-transform: none;
   letter-spacing: -0.01em;
+  min-width: 242px;
   
   /* ASI Wallet elevation system */
   box-shadow: ${({ theme }) => theme.shadow};
@@ -58,8 +60,8 @@ const ButtonBase = styled.button<ButtonProps>`
         `;
       default:
         return css`
-          padding: 12px 24px;
-          font-size: 14px;
+          padding: 10px 39px;
+          font-size: 18px;
           line-height: 24px;
           min-height: 44px; /* Touch-friendly minimum */
         `;

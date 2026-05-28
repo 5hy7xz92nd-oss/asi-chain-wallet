@@ -48,13 +48,13 @@ export const CardHeader = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 36px;
     padding-bottom: 16px;
     border-bottom: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const CardTitle = styled.h2`
-    // font-size: 28px;
+    font-size: 2rem;
     line-height: 36px;
     font-weight: 600;
     color: ${({ theme }) => theme.text.primary};
@@ -63,7 +63,7 @@ export const CardTitle = styled.h2`
 `;
 
 export const CardContent = styled.div`
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 26px;
     font-weight: 400;
 

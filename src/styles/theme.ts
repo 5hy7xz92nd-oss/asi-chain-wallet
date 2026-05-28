@@ -96,7 +96,7 @@ export const lightTheme = {
     
     text: {
       primary: '#0D1012',
-      secondary: '#5a5a5a',
+      secondary: '#5A5A5A',
       tertiary: '#757575',
       inverse: '#F7F9FA',
     },

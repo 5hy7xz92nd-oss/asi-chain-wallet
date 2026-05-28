@@ -12,14 +12,14 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const InputWrapper = styled.div<{ fullWidth?: boolean }>`
     display: ${({ fullWidth }) => (fullWidth ? "block" : "inline-block")};
     width: ${({ fullWidth }) => (fullWidth ? "100%" : "auto")};
-    margin-bottom: 16px;
+    margin-bottom: 36px;
 `;
 
 const Label = styled.label`
     display: block;
-    // font-size: 14px;
+    font-size: 1rem;
     line-height: 22px;
-    font-weight: 500;
+    font-weight: 600;
     color: ${({ theme }) => theme.text.secondary};
     margin-bottom: 8px;
     letter-spacing: -0.01em;
@@ -32,14 +32,14 @@ const Label = styled.label`
 
 const StyledInput = styled.input<{ hasError?: boolean }>`
     width: 100%;
-    padding: 12px 16px;
-    // font-size: 16px;
+    padding: 10px 16px;
+    font-size: 1rem;
     font-weight: 400;
     line-height: 24px;
     min-height: 44px; /* Touch-friendly minimum */
-    background: ${({ theme }) => theme.inputBg};
+    background: "transparent";
     border: 2px solid
-        ${({ theme, hasError }) => (hasError ? theme.danger : "transparent")};
+        ${({ theme, hasError }) => (hasError ? theme.danger : theme.colors.border)};
     border-radius: 8px;
     color: ${({ theme }) => theme.text.primary};
     transition: all 0.2s ease;
@@ -51,21 +51,21 @@ const StyledInput = styled.input<{ hasError?: boolean }>`
     &:hover:not(:disabled) {
         border-color: ${
             ({ theme, hasError }) =>
-                hasError ? theme.danger : `${theme.primary}33` /* 20% opacity */
+                hasError ? theme.danger : `${theme.primary}` /* 20% opacity */
         };
     }
 
     &:focus {
         border-color: ${({ theme, hasError }) =>
-            hasError ? theme.danger : theme.secondary};
+            hasError ? theme.danger : theme.primary};
         outline: 2px solid
             ${({ theme, hasError }) =>
-                hasError ? theme.danger : theme.secondary};
+                hasError ? theme.danger : theme.primary};
         outline-offset: 2px;
     }
 
     &::placeholder {
-        color: ${({ theme }) => theme.text.secondary};
+        color: ${({ theme }) => theme.text.primary};
         opacity: 0.7;
     }
 
