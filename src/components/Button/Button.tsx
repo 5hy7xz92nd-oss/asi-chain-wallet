@@ -46,7 +46,7 @@ const ButtonBase = styled.button<ButtonProps>`
         switch (size) {
             case "small":
                 return css`
-                    padding: 18px 16px;
+                    padding: 8px 6px;
                     font-size: 12px;
                     line-height: 22px;
                     min-height: 40px; /* Touch-friendly minimum */
@@ -115,11 +115,14 @@ const ButtonBase = styled.button<ButtonProps>`
                 return css`
                     background: transparent;
                     color: ${theme.primary};
-                    border: 2px solid ${theme.primary};
+                    border: 0.5px solid ${theme.border};
                     box-shadow: none;
+                    padding: 7px;
+                    min-width: auto;
+                    min-height: auto;
 
                     &:hover:not(:disabled) {
-                        background: ${theme.primary}1F;
+                        border-color: ${theme.text.secondary};
                         transform: translateY(-1px);
                     }
 
