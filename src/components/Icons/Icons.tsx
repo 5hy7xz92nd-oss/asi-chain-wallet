@@ -389,29 +389,20 @@ export const DownloadIcon: React.FC<IconProps> = ({
         height={size}
         viewBox="0 0 24 24"
         fill="none"
+        xmlns="http://www.w3.org/2000/svg"
         className={className}
     >
-        <path
-            d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
-            stroke={color}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M7 10L12 15L17 10"
-            stroke={color}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M12 15V3"
-            stroke={color}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
+        <g clipPath="url(#clip0_57_2481)">
+            <path
+                d="M19 9H15V3H9V9H5L12 16L19 9ZM11 11V5H13V11H14.17L12 13.17L9.83 11H11ZM5 18H19V20H5V18Z"
+                fill={color}
+            />
+        </g>
+        <defs>
+            <clipPath id="clip0_57_2481">
+                <rect width="24" height="24" fill="white" />
+            </clipPath>
+        </defs>
     </svg>
 );
 
@@ -673,5 +664,86 @@ export const EditIcon: React.FC<IconProps> = ({
             d="M3.33333 12.6667H4.28333L10.8 6.15L9.85 5.2L3.33333 11.7167V12.6667ZM2 14V11.1667L10.8 2.38333C10.9333 2.26111 11.0806 2.16667 11.2417 2.1C11.4028 2.03333 11.5722 2 11.75 2C11.9278 2 12.1 2.03333 12.2667 2.1C12.4333 2.16667 12.5778 2.26667 12.7 2.4L13.6167 3.33333C13.75 3.45556 13.8472 3.6 13.9083 3.76667C13.9694 3.93333 14 4.1 14 4.26667C14 4.44444 13.9694 4.61389 13.9083 4.775C13.8472 4.93611 13.75 5.08333 13.6167 5.21667L4.83333 14H2ZM10.3167 5.68333L9.85 5.2L10.8 6.15L10.3167 5.68333Z"
             fill={color}
         />
+    </svg>
+);
+
+export const ExpandIcon: React.FC<IconProps> = ({
+    size = 16,
+    color = "currentColor",
+    className,
+}) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <g clipPath="url(#clip0_1_603)">
+            <path
+                d="M11.06 5.72667L8 8.78L4.94 5.72667L4 6.66667L8 10.6667L12 6.66667L11.06 5.72667Z"
+                fill={color}
+            />
+        </g>
+        <defs>
+            <clipPath id="clip0_1_603">
+                <rect width="16" height="16" fill="white" />
+            </clipPath>
+        </defs>
+    </svg>
+);
+
+export const SearchIcon: React.FC<IconProps> = ({
+    size = 16,
+    color = "currentColor",
+    className,
+}) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <g clipPath="url(#clip0_1_608)">
+            <path
+                d="M10.3333 9.33333H9.80667L9.62 9.15333C10.2733 8.39333 10.6667 7.40667 10.6667 6.33333C10.6667 3.94 8.72667 2 6.33333 2C3.94 2 2 3.94 2 6.33333C2 8.72667 3.94 10.6667 6.33333 10.6667C7.40667 10.6667 8.39333 10.2733 9.15333 9.62L9.33333 9.80667V10.3333L12.6667 13.66L13.66 12.6667L10.3333 9.33333ZM6.33333 9.33333C4.67333 9.33333 3.33333 7.99333 3.33333 6.33333C3.33333 4.67333 4.67333 3.33333 6.33333 3.33333C7.99333 3.33333 9.33333 4.67333 9.33333 6.33333C9.33333 7.99333 7.99333 9.33333 6.33333 9.33333Z"
+                fill={color}
+            />
+        </g>
+        <defs>
+            <clipPath id="clip0_1_608">
+                <rect width="16" height="16" fill="white" />
+            </clipPath>
+        </defs>
+    </svg>
+);
+
+export const CopyIcon: React.FC<IconProps> = ({
+    size = 16,
+    color = "#3A3A3A",
+    className,
+}) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <g clipPath="url(#clip0_1_640)">
+            <path
+                d="M12.6667 1.33333H9.88C9.6 0.56 8.86667 0 8 0C7.13333 0 6.4 0.56 6.12 1.33333H3.33333C2.6 1.33333 2 1.93333 2 2.66667V13.3333C2 14.0667 2.6 14.6667 3.33333 14.6667H12.6667C13.4 14.6667 14 14.0667 14 13.3333V2.66667C14 1.93333 13.4 1.33333 12.6667 1.33333ZM8 1.33333C8.36667 1.33333 8.66667 1.63333 8.66667 2C8.66667 2.36667 8.36667 2.66667 8 2.66667C7.63333 2.66667 7.33333 2.36667 7.33333 2C7.33333 1.63333 7.63333 1.33333 8 1.33333ZM12.6667 13.3333H3.33333V2.66667H4.66667V4.66667H11.3333V2.66667H12.6667V13.3333Z"
+                fill={color}
+            />
+        </g>
+        <defs>
+            <clipPath id="clip0_1_640">
+                <rect width="16" height="16" fill="white" />
+            </clipPath>
+        </defs>
     </svg>
 );
