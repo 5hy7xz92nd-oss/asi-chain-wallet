@@ -10,19 +10,16 @@ import { AccountCard } from "components/AccountCard";
 import { Select } from "components/Select";
 import { Account } from "types/wallet";
 import { buildUrlWithParams } from "utils/navigationUtils";
-import { VectorIcon } from "components/Icons";
+import { HistoryIcon, VectorIcon } from "components/Icons";
+import useScreen from "hooks/useScreen";
 
 const DashboardContainer = styled.div`
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-    align-items: start;
+    display: block;
 
-    @media (min-width: 769px) {
+    @media (min-width: 1023px) {
+        display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 24px;
-        margin-bottom: 32px;
     }
 `;
 
@@ -39,6 +36,10 @@ const ContentHeader = styled.div`
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 71px;
+
+    @media (max-width: 1023px) {
+        margin-bottom: 24px;
+    }
 `;
 
 const FilterGroup = styled.div`
@@ -56,10 +57,16 @@ const FilterLabel = styled.label`
 
 const ActionsToolbar = styled.div`
     display: flex;
-    padding: 0 100px;
+    padding: 0 20px;
     justify-content: center;
     align-items: center;
     gap: 16px;
+`;
+
+const CustomAccountCard = styled(AccountCard)`
+    @media (max-width: 1023px) {
+        margin-bottom: 25px;
+    }
 `;
 
 export const Dashboard: React.FC = () => {
@@ -69,6 +76,9 @@ export const Dashboard: React.FC = () => {
         (state: RootState) => state.wallet,
     );
     const { unlockedAccounts } = useSelector((state: RootState) => state.auth);
+
+    const { isLaptop } = useScreen();
+
     const isAccountUnlocked = useMemo(() => {
         if (!selectedAccount) return false;
         return unlockedAccounts.some(
@@ -253,7 +263,7 @@ export const Dashboard: React.FC = () => {
     return (
         <div>
             <DashboardContainer>
-                <AccountCard account={selectedAccount} fullMode={false} />
+                <CustomAccountCard account={selectedAccount} fullMode={false} />
                 <Card>
                     <CardContent>
                         <ContentHeader>
@@ -271,42 +281,52 @@ export const Dashboard: React.FC = () => {
                                     options={accountOptions}
                                 />
                             </FilterGroup>
-                            <Button
-                                id="import-account-button"
-                                variant="secondary"
-                                onClick={() => navigate("/accounts")}
-                                style={{
-                                    padding: "8px 0px",
-                                    minWidth: "136px",
-                                }}
-                            >
-                                <h3>View all</h3>
-                            </Button>
+                            {!isLaptop && (
+                                <Button
+                                    id="import-account-button"
+                                    variant="secondary"
+                                    onClick={() => navigate("/accounts")}
+                                    style={{
+                                        padding: "8px 0px",
+                                        minWidth: "136px",
+                                    }}
+                                >
+                                    <h3>View all</h3>
+                                </Button>
+                            )}
                         </ContentHeader>
                         <ActionsToolbar>
                             <Button
-                                id="create-account-modal-button"
+                                id="send-action-button"
                                 onClick={() =>
                                     handleRedirectToAccountAction("/send")
                                 }
                                 fullWidth={false}
-                                style={{ minWidth: "150px" }}
+                                style={isLaptop ? {} : { minWidth: "150px" }}
                             >
                                 <h3>Send</h3>
                                 <VectorIcon />
                             </Button>
                             <Button
-                                id="create-account-modal-button"
+                                id="receive-action-button"
                                 onClick={() =>
                                     handleRedirectToAccountAction("/receive")
                                 }
                                 fullWidth={false}
-                                style={{ minWidth: "150px" }}
+                                style={isLaptop ? {} : { minWidth: "150px" }}
                             >
                                 <h3>Receive</h3>
                                 <div style={{ transform: "rotate(180deg)" }}>
                                     <VectorIcon />
                                 </div>
+                            </Button>
+                            <Button
+                                id="history-button"
+                                onClick={() => {}}
+                                variant="icon-button"
+                                fullWidth={false}
+                            >
+                                <HistoryIcon />
                             </Button>
                         </ActionsToolbar>
                     </CardContent>

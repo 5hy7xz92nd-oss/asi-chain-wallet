@@ -27,6 +27,7 @@ import { EditableLabel } from "components/EditableLabel";
 interface IAccountCardProps {
     account: Account;
     fullMode?: boolean;
+    className?: string;
 }
 
 const AccountCardWrapper = styled(Card)<{ isSelected: boolean }>`
@@ -156,6 +157,7 @@ const RemoveButton = styled(Button)`
 export const AccountCard = ({
     account,
     fullMode = true,
+    className = "",
 }: IAccountCardProps): ReactElement => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -221,6 +223,7 @@ export const AccountCard = ({
             key={account.id}
             id={`account-card-${account.id}`}
             isSelected={isSelected}
+            className={className}
             onClick={() => handleSelectAccount(account.id)}
         >
             <AccountHeader>
