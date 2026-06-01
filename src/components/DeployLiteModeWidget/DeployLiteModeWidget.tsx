@@ -472,11 +472,11 @@ const DeployLiteModeWidgetRoot: React.FC<DeployLiteModeWidgetProps> = ({
 
 const DeployLiteModeActions: React.FC = () => {
     const { loadExample } = useDeployLiteMode();
-    const { isLaptop } = useScreen();
+    const { isTablet } = useScreen();
 
     return (
         <FormRow>
-            <Button fullWidth={isLaptop} onClick={loadExample}>
+            <Button fullWidth={isTablet} onClick={loadExample}>
                 <h3>Load Example</h3>
             </Button>
         </FormRow>

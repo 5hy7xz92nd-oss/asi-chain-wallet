@@ -26,13 +26,15 @@ const DeployHeader = styled.div`
     gap: 31px;
     margin-bottom: 36px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
         display: block;
     }
 `;
 
 const FormGroup = styled.div`
-    @media (max-width: 768px) {
+    min-width: 200px;
+
+    @media (max-width: 1024px) {
         width: 100%;
     }
 `;
@@ -42,7 +44,7 @@ const FormRow = styled.div`
     gap: 16px;
     align-items: end;
 
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
         flex-direction: column;
         align-items: start;
         margin-bottom: 16px;
@@ -90,9 +92,7 @@ const deployWidgetsByMode: Record<DeployPageMods, DeployModeWidget> = {
 export const Deploy: React.FC = () => {
     const navigate = useNavigate();
     const { selectedAccount } = useSelector((state: RootState) => state.wallet);
-    const { isLaptop } = useScreen();
-
-    console.log("IS LAPTOP: ", isLaptop);
+    const { isTablet } = useScreen();
 
     const [selectedMode, setSelectedMode] = useState<DeployPageMods>(
         DeployPageMods.LITE,
@@ -149,11 +149,14 @@ export const Deploy: React.FC = () => {
                                 <Input
                                     id="deploy-phlo-limit-input"
                                     className="deploy-phlo-limit-input text-3"
-                                    wrapperStyle={{ marginBottom: 0 }}
+                                    wrapperStyle={{
+                                        marginBottom: 0,
+                                        minWidth: "200px",
+                                    }}
                                     labelStyle={{ color: "#0D1012" }}
                                     label="Phlo Limit"
                                     value={phloLimit}
-                                    fullWidth={isLaptop}
+                                    fullWidth={isTablet}
                                     onChange={(e) =>
                                         setPhloLimit(e.target.value)
                                     }
@@ -162,11 +165,14 @@ export const Deploy: React.FC = () => {
                                 <Input
                                     id="deploy-phlo-price-input"
                                     className="deploy-phlo-price-input text-3"
-                                    wrapperStyle={{ marginBottom: 0 }}
+                                    wrapperStyle={{
+                                        marginBottom: 0,
+                                        minWidth: "200px",
+                                    }}
                                     labelStyle={{ color: "#0D1012" }}
                                     label="Phlo Price"
                                     value={phloPrice}
-                                    fullWidth={isLaptop}
+                                    fullWidth={isTablet}
                                     onChange={(e) =>
                                         setPhloPrice(e.target.value)
                                     }

@@ -7,11 +7,13 @@ interface IScreenDimensions {
 
 interface IUseScreenResponse extends IScreenDimensions {
     isLaptop: boolean;
+    isTablet: boolean;
 }
 
 const DEFAULT_DEBOUNCE_IN_MILLISECONDS: number = 100;
 
 export const LAPTOP_SCREEN_WIDTH_IN_PIXELS: number = 768;
+export const TABLET_SCREEN_WIDTH_IN_PIXELS: number = 1023;
 
 function useScreen(
     debounceMs: number = DEFAULT_DEBOUNCE_IN_MILLISECONDS,
@@ -78,9 +80,14 @@ function useScreen(
         () => dimensions.width <= LAPTOP_SCREEN_WIDTH_IN_PIXELS,
         [dimensions.width],
     );
+    const isTablet: boolean = useMemo(
+        () => dimensions.width <= TABLET_SCREEN_WIDTH_IN_PIXELS,
+        [dimensions.width],
+    );
 
     return {
         isLaptop,
+        isTablet,
         ...dimensions,
     };
 }

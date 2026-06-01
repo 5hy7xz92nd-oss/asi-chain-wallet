@@ -4,6 +4,8 @@ import React, {
     useRef,
     createContext,
     useContext,
+    CSSProperties,
+    useMemo,
 } from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
@@ -36,6 +38,7 @@ import IDEStorageService, {
 } from "services/ideStorage";
 import { SecureStorage } from "services/secureStorage";
 import { getGasFeeAsNumber } from "../../constants/gas";
+import useScreen from "hooks/useScreen";
 
 const PENDING_TRANSACTIONS_KEY = "asi_wallet_pending_transactions";
 
@@ -85,21 +88,35 @@ const IDEContainer = styled.div`
     display: flex;
     flex-direction: column;
     overflow: hidden;
+
+    @media (max-width: 768px) {
+        height: auto;
+    }
 `;
 
 const Toolbar = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
     background: ${({ theme }) => theme.card};
+    margin-bottom: 24px;
+
     // border-bottom: 1px solid ${({ theme }) => theme.border};
+
+    @media (max-width: 768px) {
+        margin-bottom: 36px;
+    }
 `;
 
 const ToolbarActions = styled.div`
     display: flex;
     gap: 8px;
     align-items: center;
+    width: 100%;
+
+    @media (max-width: 768px) {
+        margin-bottom: 1rem;
+    }
 `;
 
 const MainContent = styled.div`
@@ -108,6 +125,12 @@ const MainContent = styled.div`
     overflow: hidden;
     width: 100%;
     gap: 24px;
+    margin-bottom: 24px;
+
+    @media (max-width: 768px) {
+        display: block;
+        margin-bottom: 36px;
+    }
 `;
 
 const FileExplorer = styled.div`
@@ -117,6 +140,10 @@ const FileExplorer = styled.div`
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const FileExplorerContent = styled.div`
@@ -189,6 +216,10 @@ const EditorContainer = styled.div`
     flex-direction: column;
     min-width: 0; // Prevent overflow
     overflow: hidden;
+
+    @media (max-width: 768px) {
+        height: fit-content;
+    }
 `;
 
 const EditorHeader = styled.div`
@@ -242,6 +273,11 @@ const EditorWrapper = styled.div<{ darkMode: boolean }>`
     border: 1px solid ${({ theme }) => theme.border};
     border-radius: 8px;
     padding: 16px;
+
+    @media (max-width: 768px) {
+        height: 440px;
+        flex: initial;
+    }
 `;
 
 const OutputPanel = styled.div`
@@ -257,7 +293,7 @@ const ConsolePanel = styled(OutputPanel)`
 `;
 
 const OutputHeader = styled.div`
-    padding: 8px 16px;
+    padding: 8px 4px;
     background: ${({ theme }) => theme.surface};
     // font-size: 14px;
     font-weight: 600;
@@ -1055,18 +1091,27 @@ const DeployProModeWidgetRoot: React.FC<DeployProModeWidgetProps> = ({
 
 const DeployProModeActions: React.FC = () => {
     const { items, workspaceInputRef } = useDeployProMode();
+    const { isTablet } = useScreen();
+
+    const adaptiveButtonStyle: CSSProperties = useMemo(
+        () => (!isTablet ? {} : { fontSize: "16px" }),
+        [isTablet],
+    );
 
     return (
         <ToolbarActions>
             <Button
                 id="ide-import-workspace-button"
-                style={{ marginRight: "1rem" }}
+                style={adaptiveButtonStyle}
+                fullWidth={isTablet}
                 onClick={() => workspaceInputRef.current?.click()}
             >
                 <h3>Import Workspace</h3>
             </Button>
             <Button
                 id="ide-export-workspace-button"
+                style={adaptiveButtonStyle}
+                fullWidth={isTablet}
                 onClick={() => IDEStorageService.exportWorkspace(items)}
             >
                 <h3>Export Workspace</h3>
@@ -1351,6 +1396,14 @@ const DeployProModeBoard: React.FC = () => {
             <Toolbar>
                 <DeploySettings>
                     <Button
+                        id="ide-deploy-button"
+                        size="small"
+                        onClick={handleDeploy}
+                        loading={isDeploying}
+                    >
+                        <h3>Deploy</h3>
+                    </Button>
+                    <Button
                         id="ide-explore-button"
                         size="small"
                         variant="secondary"
@@ -1358,14 +1411,6 @@ const DeployProModeBoard: React.FC = () => {
                         loading={isDeploying}
                     >
                         <h3>Explore</h3>
-                    </Button>
-                    <Button
-                        id="ide-deploy-button"
-                        size="small"
-                        onClick={handleDeploy}
-                        loading={isDeploying}
-                    >
-                        <h3>Deploy</h3>
                     </Button>
                     <Button variant="ghost" size="small" onClick={clearConsole}>
                         <h3 className="text-danger">Clear</h3>
