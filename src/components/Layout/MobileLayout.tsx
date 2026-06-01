@@ -14,6 +14,7 @@ import {
     CloseIcon,
     LogoutIcon,
 } from "components/Icons";
+import { Button } from "components/Button";
 
 const Container = styled.div`
     min-height: 100vh;
@@ -172,6 +173,9 @@ const MobileNavDrawer = styled.div<{ $isOpen: boolean }>`
     z-index: 1000;
     overflow-y: auto;
 
+    display: flex;
+    flex-direction: column;
+
     @media (min-width: 1250px) {
         display: none;
     }
@@ -205,15 +209,12 @@ const MobileNavContent = styled.div`
 `;
 
 const MobileNavSection = styled.div`
-    margin-bottom: 24px;
+    // margin-bottom: 24px;
 `;
 
-const MobileNavSectionTitle = styled.h3`
-    font-size: 12px;
-    text-transform: uppercase;
-    color: ${({ theme }) => theme.text.tertiary};
-    margin-bottom: 12px;
-    font-weight: 600;
+const LogoutSection = styled.div`
+    padding: 25px;
+    margin-top: auto;
 `;
 
 const MobileNavLink = styled.button<{ $active: boolean }>`
@@ -269,9 +270,23 @@ const ExternalNavLink = styled(NavLink)`
     gap: 5px;
 `;
 
+const ExternalNavLinkMobile = styled(MobileNavLink)`
+    color: ${({ theme }) => theme.text.primary};
+    display: flex;
+    align-items: center;
+    gap: 5px;
+`;
+
 const Delimiter = styled.div`
     display: flex;
     align-items: center;
+`;
+
+const DelimiterLine = styled.div`
+    width: 100%;
+    height: 1px;
+    background: ${({ theme }) => theme.border};
+    margin: 16px auto;
 `;
 
 const RightSection = styled.div`
@@ -324,6 +339,16 @@ const NetworkStatusBar = styled.div<{ $connected: boolean }>`
     gap: 8px;
 `;
 
+const LogoutButton = styled(Button)`
+    border-color: ${({ theme }) => theme.danger};
+    color: ${({ theme }) => theme.danger};
+
+    &:hover:not(:disabled) {
+        background: ${({ theme }) =>
+            theme.danger}1F; /* 12% opacity as per brand guide */
+    }
+`;
+
 interface LogoImageProps {
     isDarkMode: boolean;
 }
@@ -366,6 +391,11 @@ const formatRelativeTime = (date: Date) => {
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
     return `${Math.floor(seconds / 86400)} days ago`;
 };
+
+const externalLinksSet = [
+    { path: "/0", label: "Explorer" },
+    { path: "/1", label: "Faucet" },
+];
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -550,15 +580,14 @@ export const MobileLayout: React.FC<LayoutProps> = ({ children }) => {
         </Delimiter>
     );
 
-    const ExternalLinks = () => {
-        const links = [
-            { path: "/0", label: "Explorer" },
-            { path: "/1", label: "Faucet" },
-        ];
+    const DelimiterBlockMobile = () => (
+        <DelimiterLine>{/* <hr /> */}</DelimiterLine>
+    );
 
+    const ExternalLinks = () => {
         return (
             <Fragment>
-                {links.map((item) => (
+                {externalLinksSet.map((item) => (
                     <ExternalNavLink
                         $active={false}
                         key={item.path}
@@ -579,6 +608,35 @@ export const MobileLayout: React.FC<LayoutProps> = ({ children }) => {
                             />
                         </svg>
                     </ExternalNavLink>
+                ))}
+            </Fragment>
+        );
+    };
+
+    const ExternalLinksMobile = () => {
+        return (
+            <Fragment>
+                {externalLinksSet.map((item) => (
+                    <ExternalNavLinkMobile
+                        $active={false}
+                        key={item.path}
+                        className="text-1"
+                        onClick={() => navigate(item.path)}
+                    >
+                        {item.label}
+                        <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M10.6667 10.6667H1.33333V1.33333H6V0H1.33333C0.593333 0 0 0.6 0 1.33333V10.6667C0 11.4 0.593333 12 1.33333 12H10.6667C11.4 12 12 11.4 12 10.6667V6H10.6667V10.6667ZM7.33333 0V1.33333H9.72667L3.17333 7.88667L4.11333 8.82667L10.6667 2.27333V4.66667H12V0H7.33333Z"
+                                fill="currentcolor"
+                            />
+                        </svg>
+                    </ExternalNavLinkMobile>
                 ))}
             </Fragment>
         );
@@ -705,9 +763,6 @@ export const MobileLayout: React.FC<LayoutProps> = ({ children }) => {
 
                 <MobileNavContent>
                     <MobileNavSection>
-                        <MobileNavSectionTitle>
-                            Navigation
-                        </MobileNavSectionTitle>
                         {navItems.map((item) => (
                             <MobileNavLink
                                 key={item.path}
@@ -717,8 +772,37 @@ export const MobileLayout: React.FC<LayoutProps> = ({ children }) => {
                                 {item.label}
                             </MobileNavLink>
                         ))}
+                        <DelimiterBlockMobile />
+                        <ExternalLinksMobile />
                     </MobileNavSection>
                 </MobileNavContent>
+                <LogoutSection>
+                    {isAuthenticated && (
+                        <LogoutButton
+                            fullWidth
+                            variant="secondary"
+                            onClick={handleLogout}
+                        >
+                            Logout
+                            <svg
+                                width="20"
+                                height="18"
+                                viewBox="0 0 20 18"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M2 2L10 2L10 0L2 6.99382e-07C0.899998 7.95547e-07 -1.49493e-06 0.9 -1.39876e-06 2L-1.74846e-07 16C-7.86805e-08 17.1 0.9 18 2 18L10 18L10 16L2 16L2 2Z"
+                                    fill="currentcolor"
+                                />
+                                <path
+                                    d="M15 4L13.6 5.4L16.2 8H6V10H16.2L13.6 12.6L15 14L20 9L15 4Z"
+                                    fill="currentcolor"
+                                />
+                            </svg>
+                        </LogoutButton>
+                    )}
+                </LogoutSection>
             </MobileNavDrawer>
 
             <Main $fullWidth={location.pathname === "/deploy"}>{children}</Main>
