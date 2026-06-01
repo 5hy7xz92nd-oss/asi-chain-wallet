@@ -6,6 +6,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     error?: string;
     fullWidth?: boolean;
     wrapperStyle?: CSSProperties;
+    labelStyle?: CSSProperties;
     "data-testid"?: string;
     "data-cy"?: string;
 }
@@ -156,6 +157,7 @@ export const Input: React.FC<InputProps> = ({
     onInput,
     autoFocus,
     wrapperStyle,
+    labelStyle,
     ...props
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -191,7 +193,7 @@ export const Input: React.FC<InputProps> = ({
 
     return (
         <InputWrapper fullWidth={fullWidth} style={wrapperStyle}>
-            <h4>{label && <Label>{label}</Label>}</h4>
+            <h4>{label && <Label style={labelStyle}>{label}</Label>}</h4>
             <StyledInput
                 ref={inputRef}
                 hasError={!!error}

@@ -7,6 +7,7 @@ import { SecureStorage } from "services/secureStorage";
 import { getGasFeeAsNumber } from "../../constants/gas";
 import { Button, DeploymentConfirmationModal } from "components";
 import { DeleteIcon, PreviewIcon } from "components/Icons";
+import useScreen from "hooks/useScreen";
 
 const PENDING_TRANSACTIONS_KEY = "asi_wallet_pending_transactions";
 
@@ -80,7 +81,7 @@ const CodeEditor = styled.textarea`
     border-radius: 8px;
     color: ${({ theme }) => theme.text.primary};
     resize: vertical;
-    margin-bottom: 16px;
+    margin-bottom: 36px;
 
     &:focus {
         border-color: ${({ theme }) => theme.primary};
@@ -107,6 +108,22 @@ const FormRow = styled.div`
     display: flex;
     gap: 16px;
     align-items: end;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+`;
+
+const BoardActions = styled.div`
+    display: flex;
+    gap: 24px;
+    align-items: center;
+`;
+
+const DeployButton = styled(Button)`
+    @media (min-width: 768px) {
+        min-width: 157px;
+    }
 `;
 
 const ResultContainer = styled.div`
@@ -455,10 +472,11 @@ const DeployLiteModeWidgetRoot: React.FC<DeployLiteModeWidgetProps> = ({
 
 const DeployLiteModeActions: React.FC = () => {
     const { loadExample } = useDeployLiteMode();
+    const { isLaptop } = useScreen();
 
     return (
         <FormRow>
-            <Button onClick={loadExample}>
+            <Button fullWidth={isLaptop} onClick={loadExample}>
                 <h3>Load Example</h3>
             </Button>
         </FormRow>
@@ -487,6 +505,10 @@ const DeployLiteModeBoard: React.FC = () => {
         closeDeployConfirmation,
         closeExploreConfirmation,
     } = useDeployLiteMode();
+
+    const { isLaptop } = useScreen();
+
+    const clearButtonVariant = !isLaptop ? "ghost" : "icon-button";
 
     return (
         <>
@@ -546,14 +568,8 @@ const DeployLiteModeBoard: React.FC = () => {
                     placeholder="Enter your Rholang code here..."
                     disabled={isLoading}
                 />
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "24px",
-                        marginTop: "8px",
-                    }}
-                >
-                    <Button
+                <BoardActions>
+                    <DeployButton
                         id="deploy-contract-button"
                         onClick={handleDeployClick}
                         loading={isLoading}
@@ -562,12 +578,9 @@ const DeployLiteModeBoard: React.FC = () => {
                             !selectedAccount ||
                             !isAccountUnlocked
                         }
-                        style={{
-                            minWidth: "157px",
-                        }}
                     >
                         <h3>Deploy</h3>
-                    </Button>
+                    </DeployButton>
                     <Button
                         variant="secondary"
                         onClick={handleExploreClick}
@@ -575,13 +588,17 @@ const DeployLiteModeBoard: React.FC = () => {
                         disabled={!code.trim()}
                     >
                         <h3>Explore</h3>
-                        <PreviewIcon />
+                        {!isLaptop && <PreviewIcon />}
                     </Button>
-                    <Button variant="ghost" size="small" onClick={clearCode}>
-                        <h3 className="text-danger">Clear</h3>
+                    <Button
+                        variant={clearButtonVariant}
+                        size="small"
+                        onClick={clearCode}
+                    >
+                        {!isLaptop && <h3 className="text-danger">Clear</h3>}
                         <DeleteIcon />
                     </Button>
-                </div>
+                </BoardActions>
             </FormGroup>
             {result && (
                 <ResultContainer>

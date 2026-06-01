@@ -3,11 +3,19 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { RootState } from "store";
-import { Card, CardHeader, CardTitle, CardContent, Button, Input } from "components";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    Button,
+    Input,
+} from "components";
 import { Select } from "components/Select";
 import { ISelectOption } from "components/Select/Select";
 import { DeployLiteModeWidget } from "components/DeployLiteModeWidget";
 import { DeployProModeWidget } from "components/DeployProModeWidget";
+import useScreen from "hooks/useScreen";
 
 const DeployContainer = styled.div``;
 
@@ -17,20 +25,34 @@ const DeployHeader = styled.div`
     width: 100%;
     gap: 31px;
     margin-bottom: 36px;
+
+    @media (max-width: 768px) {
+        display: block;
+    }
 `;
 
-const FormGroup = styled.div``;
+const FormGroup = styled.div`
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+`;
 
 const FormRow = styled.div`
     display: flex;
     gap: 16px;
     align-items: end;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: start;
+        margin-bottom: 16px;
+    }
 `;
 
 const Label = styled.label`
     // font-size: 14px;
     font-weight: 500;
-    color: ${({ theme }) => theme.text.secondary};
+    color: ${({ theme }) => theme.text.primary};
 `;
 
 enum DeployPageMods {
@@ -67,9 +89,10 @@ const deployWidgetsByMode: Record<DeployPageMods, DeployModeWidget> = {
 
 export const Deploy: React.FC = () => {
     const navigate = useNavigate();
-    const { selectedAccount } = useSelector(
-        (state: RootState) => state.wallet,
-    );
+    const { selectedAccount } = useSelector((state: RootState) => state.wallet);
+    const { isLaptop } = useScreen();
+
+    console.log("IS LAPTOP: ", isLaptop);
 
     const [selectedMode, setSelectedMode] = useState<DeployPageMods>(
         DeployPageMods.LITE,
@@ -127,9 +150,10 @@ export const Deploy: React.FC = () => {
                                     id="deploy-phlo-limit-input"
                                     className="deploy-phlo-limit-input text-3"
                                     wrapperStyle={{ marginBottom: 0 }}
+                                    labelStyle={{ color: "#0D1012" }}
                                     label="Phlo Limit"
                                     value={phloLimit}
-                                    fullWidth={false}
+                                    fullWidth={isLaptop}
                                     onChange={(e) =>
                                         setPhloLimit(e.target.value)
                                     }
@@ -139,9 +163,10 @@ export const Deploy: React.FC = () => {
                                     id="deploy-phlo-price-input"
                                     className="deploy-phlo-price-input text-3"
                                     wrapperStyle={{ marginBottom: 0 }}
+                                    labelStyle={{ color: "#0D1012" }}
                                     label="Phlo Price"
                                     value={phloPrice}
-                                    fullWidth={false}
+                                    fullWidth={isLaptop}
                                     onChange={(e) =>
                                         setPhloPrice(e.target.value)
                                     }
