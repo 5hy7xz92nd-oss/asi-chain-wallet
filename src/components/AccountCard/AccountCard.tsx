@@ -43,6 +43,10 @@ const AccountCardWrapper = styled(Card)<{ isSelected: boolean }>`
         border-color: ${({ theme }) => theme.primary};
         transform: translateY(-2px);
     }
+
+    @media (max-width: 768px) {
+        min-width: auto;
+    }
 `;
 
 const AccountHeader = styled.div`
@@ -53,7 +57,7 @@ const AccountHeader = styled.div`
 `;
 
 const CustomEditableLabel = styled(EditableLabel)<{ isSelected: boolean }>`
-    font-size: 20px !important;
+    font-size: 1.25rem !important;
     font-weight: 400 !important;
     color: ${({ isSelected, theme }) =>
         !isSelected

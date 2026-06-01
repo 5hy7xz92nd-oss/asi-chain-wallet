@@ -24,7 +24,7 @@ const EditableContainer = styled.div`
 
 const LabelDisplay = styled.span<{ isSelected: boolean; disabled?: boolean }>`
     cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-    font-size: 20px !important;
+    font-size: 1.25rem !important;
     font-weight: 400;
     color: ${({ isSelected, theme }) =>
         !isSelected

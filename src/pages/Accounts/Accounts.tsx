@@ -2,40 +2,15 @@ import React, { useState, useEffect, useMemo, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "store";
-import {
-    selectAccount,
-    removeAccount,
-    syncAccounts,
-    fetchBalance,
-} from "store/walletSlice";
-import {
-    createAccountWithPassword,
-    importAccountWithPassword,
-    exportAccountKeyfile,
-} from "store/authSlice";
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    Button,
-    Input,
-    PrivateKeyDisplay,
-} from "components";
-import { PasswordSetup } from "components/PasswordSetup";
-import { SecureStorage } from "services/secureStorage";
-import { validateAccountName } from "utils/textUtils";
+import { syncAccounts, fetchBalance } from "store/walletSlice";
+import { Card, CardHeader, CardTitle, CardContent, Button } from "components";
 import { getAddressLabel } from "../../constants/token";
-import {
-    importPrivateKey,
-    importEthAddress,
-    importRevAddress,
-} from "utils/crypto";
 import { ReloadIcon } from "components/Icons";
 import { AccountCard } from "components/AccountCard";
 import { Account } from "types/wallet";
 import { CreateAccountModal } from "components/CreateAccountModal";
 import { ImportAccountModal } from "components/ImportAccountModal";
+import useScreen from "hooks/useScreen";
 
 const AccountsContainer = styled.div``;
 
@@ -44,52 +19,10 @@ const AccountsGrid = styled.div`
     grid-template-columns: repeat(auto-fill, minmax(462px, 1fr));
     gap: 20px;
     margin-bottom: 32px;
-`;
 
-const CreateAccountSection = styled.div`
-    width: 100%;
-    max-width: 705px;
-    margin: 16px auto 32px;
-`;
-
-const FormContainer = styled.div`
-    gap: 24px;
-    margin-top: 24px;
-`;
-
-const ActionButtons = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-`;
-
-const ImportTypeSelector = styled.select`
-    padding: 12px 16px;
-    border: 2px solid ${({ theme }) => theme.border};
-    border-radius: 8px;
-    background: ${({ theme }) => theme.surface};
-    color: ${({ theme }) => theme.text.primary};
-    font-size: 16px;
-    margin-bottom: 16px;
-    width: 100%;
-`;
-
-const WarningMessage = styled.div`
-    background: ${({ theme }) => `${theme.warning}20`};
-    border: 1px solid ${({ theme }) => `${theme.warning}40`};
-    color: ${({ theme }) => theme.warning};
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .icon {
-        font-size: 16px;
+    @media (max-width: 768px) {
+        display: flex;
+        flex-direction: column;
     }
 `;
 
@@ -127,6 +60,11 @@ const AccountsActionsFooter = styled.div`
     display: flex;
     justify-content: center;
     gap: 16px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        padding: 0 100px;
+    }
 `;
 
 export const Accounts: React.FC = () => {
@@ -136,6 +74,8 @@ export const Accounts: React.FC = () => {
     const { unlockedAccounts, isAuthenticated, hasAccounts } = useSelector(
         (state: RootState) => state.auth,
     );
+
+    const { isLaptop } = useScreen();
 
     const selectedNetworkId = selectedNetwork?.id;
     const filteredAccounts = useMemo(
@@ -148,26 +88,9 @@ export const Accounts: React.FC = () => {
         [accounts, selectedNetworkId],
     );
 
-    const [showPasswordSetup, setShowPasswordSetup] = useState(false);
-    const [showImportPassword, setShowImportPassword] = useState(false);
-    const [showPrivateKey, setShowPrivateKey] = useState(false);
-    const [pendingAccountName, setPendingAccountName] = useState("");
-    const [pendingPrivateKey, setPendingPrivateKey] = useState("");
-    const [pendingImport, setPendingImport] = useState<{
-        name: string;
-        value: string;
-        type: "private" | "public" | "eth" | "rev";
-    } | null>(null);
-
-    const [newAccountName, setNewAccountName] = useState("");
-    const [importName, setImportName] = useState("");
-    const [importValue, setImportValue] = useState("");
     const [importType, setImportType] = useState<
         "private" | "public" | "eth" | "rev"
     >("private");
-    const [newAccountNameError, setNewAccountNameError] = useState("");
-    const [importNameError, setImportNameError] = useState("");
-    const [importValueError, setImportValueError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -233,119 +156,6 @@ export const Accounts: React.FC = () => {
         }
     };
 
-    const handlePasswordSet = async (password: string) => {
-        if (pendingAccountName) {
-            const resultAction = await dispatch(
-                createAccountWithPassword({
-                    name: pendingAccountName,
-                    password,
-                    networkId: selectedNetworkId,
-                }) as any,
-            );
-
-            if (createAccountWithPassword.fulfilled.match(resultAction)) {
-                setPendingPrivateKey(
-                    resultAction.payload.account.privateKey || "",
-                );
-                setShowPasswordSetup(false);
-                setShowPrivateKey(true);
-            }
-        } else if (pendingImport) {
-            const resultAction = await dispatch(
-                importAccountWithPassword({
-                    ...pendingImport,
-                    password,
-                    networkId: selectedNetworkId,
-                }) as any,
-            );
-
-            if (importAccountWithPassword.fulfilled.match(resultAction)) {
-                dispatch(syncAccounts([resultAction.payload.account]));
-
-                setSuccessMessage(
-                    `Account "${pendingImport.name}" imported successfully! 🎉`,
-                );
-                setTimeout(() => setSuccessMessage(""), 5000);
-                setImportName("");
-                setImportValue("");
-                setPendingImport(null);
-                setShowImportPassword(false);
-            } else if (importAccountWithPassword.rejected.match(resultAction)) {
-                const errorMessage =
-                    resultAction.error?.message || "Failed to import account";
-                if (errorMessage.includes("already exists")) {
-                    setImportValueError(errorMessage);
-                    setImportNameError("");
-                } else {
-                    setImportValueError(errorMessage);
-                    setImportNameError("");
-                }
-                setShowImportPassword(false);
-            }
-        }
-    };
-
-    const handlePrivateKeyAcknowledged = () => {
-        const userId = SecureStorage.getCurrentUserId();
-        dispatch(
-            syncAccounts(
-                SecureStorage.getEncryptedAccounts(userId || undefined).map(
-                    (acc) => ({
-                        ...acc,
-                        privateKey: undefined,
-                    }),
-                ),
-            ),
-        );
-
-        // Show success message
-        setSuccessMessage(
-            `Account "${pendingAccountName}" created successfully! 🎉`,
-        );
-        setTimeout(() => setSuccessMessage(""), 5000);
-
-        setNewAccountName("");
-        setPendingAccountName("");
-        setPendingPrivateKey("");
-        setShowPrivateKey(false);
-    };
-
-    const checkAccountExistsByValue = (
-        value: string,
-        type: string | "private" | "public" | "eth" | "rev",
-    ): boolean => {
-        try {
-            let accountData: { revAddress?: string; ethAddress?: string };
-            const normalizedType =
-                type === getAddressLabel() || type === "rev"
-                    ? "rev"
-                    : (type as "private" | "eth" | "rev");
-
-            switch (normalizedType) {
-                case "private":
-                    accountData = importPrivateKey(value);
-                    break;
-                case "eth":
-                    accountData = importEthAddress(value);
-                    break;
-                case "rev":
-                    accountData = importRevAddress(value);
-                    break;
-                default:
-                    return false;
-            }
-
-            const userId = SecureStorage.getCurrentUserId();
-            return SecureStorage.accountExists(
-                accountData.revAddress,
-                accountData.ethAddress,
-                userId || undefined,
-            );
-        } catch (error) {
-            return false;
-        }
-    };
-
     const getImportPlaceholder = () => {
         switch (importType) {
             case "private":
@@ -360,149 +170,6 @@ export const Accounts: React.FC = () => {
                 return "Enter value";
         }
     };
-
-    const handleCreateAccount = () => {
-        const trimmedName = newAccountName.trim();
-        const validation = validateAccountName(trimmedName);
-
-        if (!validation.isValid) {
-            setNewAccountNameError(validation.error || "Invalid account name");
-            return;
-        }
-
-        setNewAccountNameError("");
-        setPendingAccountName(trimmedName);
-        setShowPasswordSetup(true);
-    };
-
-    const handleImportAccount = () => {
-        const trimmedName = newAccountName.trim();
-        const trimmedValue = importValue.trim();
-
-        if (!trimmedName || !trimmedValue) {
-            return;
-        }
-
-        const validation = validateAccountName(trimmedName);
-        if (!validation.isValid) {
-            setImportNameError(validation.error || "Invalid account name");
-            setImportValueError("");
-            return;
-        }
-
-        const normalizedType =
-            importType === getAddressLabel() || importType === "rev"
-                ? "rev"
-                : (importType as "private" | "eth" | "rev");
-
-        if (checkAccountExistsByValue(trimmedValue, normalizedType)) {
-            setImportValueError("Account with this address already exists");
-            setImportNameError("");
-            return;
-        }
-
-        setImportNameError("");
-        setImportValueError("");
-
-        if (normalizedType === "private") {
-            setPendingImport({
-                name: trimmedName,
-                value: trimmedValue,
-                type: normalizedType,
-            });
-            setShowImportPassword(true);
-        } else {
-            dispatch(
-                importAccountWithPassword({
-                    name: trimmedName,
-                    value: trimmedValue,
-                    type: normalizedType,
-                    password: "",
-                }) as any,
-            ).then((resultAction: any) => {
-                if (importAccountWithPassword.fulfilled.match(resultAction)) {
-                    dispatch(syncAccounts([resultAction.payload.account]));
-                    setSuccessMessage(
-                        `Account "${trimmedName}" imported successfully!`,
-                    );
-                    setTimeout(() => setSuccessMessage(""), 5000);
-                    setImportName("");
-                    setImportValue("");
-                } else if (
-                    importAccountWithPassword.rejected.match(resultAction)
-                ) {
-                    const errorMessage =
-                        resultAction.error?.message ||
-                        "Failed to import account";
-                    if (errorMessage.includes("already exists")) {
-                        setImportValueError(errorMessage);
-                        setImportNameError("");
-                    } else if (errorMessage.includes("Invalid import type")) {
-                        setImportValueError(errorMessage);
-                        setImportNameError("");
-                    } else {
-                        setImportValueError(errorMessage);
-                        setImportNameError("");
-                    }
-                }
-            });
-        }
-    };
-
-    if (showPasswordSetup) {
-        return (
-            <AccountsContainer>
-                <Card>
-                    <CardContent>
-                        <PasswordSetup
-                            title="Set Password for New Account"
-                            onPasswordSet={handlePasswordSet}
-                            onCancel={() => {
-                                setShowPasswordSetup(false);
-                                setPendingAccountName("");
-                            }}
-                        />
-                    </CardContent>
-                </Card>
-            </AccountsContainer>
-        );
-    }
-
-    if (showPrivateKey) {
-        return (
-            <AccountsContainer>
-                <PrivateKeyDisplay
-                    privateKey={pendingPrivateKey}
-                    accountName={pendingAccountName}
-                    onContinue={handlePrivateKeyAcknowledged}
-                    onBack={() => {
-                        setShowPrivateKey(false);
-                        setShowPasswordSetup(true);
-                    }}
-                    showBackButton={true}
-                />
-            </AccountsContainer>
-        );
-    }
-
-    if (showImportPassword) {
-        return (
-            <AccountsContainer>
-                <Card>
-                    <CardContent>
-                        <PasswordSetup
-                            title="Set Password for Imported Account"
-                            onPasswordSet={handlePasswordSet}
-                            onCancel={() => {
-                                setShowImportPassword(false);
-                                setPendingImport(null);
-                            }}
-                        />
-                    </CardContent>
-                </Card>
-            </AccountsContainer>
-        );
-    }
 
     return (
         <Fragment>
@@ -545,7 +212,7 @@ export const Accounts: React.FC = () => {
                                 <Button
                                     id="create-account-button"
                                     onClick={() => setShowCreateModal(true)}
-                                    fullWidth={false}
+                                    fullWidth={isLaptop}
                                 >
                                     <h3>Create Account </h3>
                                     <svg
@@ -565,7 +232,7 @@ export const Accounts: React.FC = () => {
                                     id="import-account-button"
                                     variant="secondary"
                                     onClick={() => setShowImportModal(true)}
-                                    fullWidth={false}
+                                    fullWidth={isLaptop}
                                 >
                                     <h3>Import Account</h3>
                                     <svg
