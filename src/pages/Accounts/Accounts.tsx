@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "store";
@@ -34,6 +34,8 @@ import {
 import { ReloadIcon } from "components/Icons";
 import { AccountCard } from "components/AccountCard";
 import { Account } from "types/wallet";
+import { CreateAccountModal } from "components/CreateAccountModal";
+import { ImportAccountModal } from "components/ImportAccountModal";
 
 const AccountsContainer = styled.div``;
 
@@ -120,6 +122,13 @@ const SuccessMessage = styled.div`
     }
 `;
 
+const AccountsActionsFooter = styled.div`
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+`;
+
 export const Accounts: React.FC = () => {
     const dispatch = useDispatch();
     const { accounts, selectedAccount, selectedNetwork, isLoading } =
@@ -160,6 +169,9 @@ export const Accounts: React.FC = () => {
     const [importNameError, setImportNameError] = useState("");
     const [importValueError, setImportValueError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false);
 
     const filteredAccountIds = useMemo(
         () => filteredAccounts.map((account) => account.id).join(","),
@@ -219,20 +231,6 @@ export const Accounts: React.FC = () => {
                 );
             });
         }
-    };
-
-    const handleCreateAccount = () => {
-        const trimmedName = newAccountName.trim();
-        const validation = validateAccountName(trimmedName);
-
-        if (!validation.isValid) {
-            setNewAccountNameError(validation.error || "Invalid account name");
-            return;
-        }
-
-        setNewAccountNameError("");
-        setPendingAccountName(trimmedName);
-        setShowPasswordSetup(true);
     };
 
     const handlePasswordSet = async (password: string) => {
@@ -348,6 +346,35 @@ export const Accounts: React.FC = () => {
         }
     };
 
+    const getImportPlaceholder = () => {
+        switch (importType) {
+            case "private":
+                return "Enter private key (64 hex characters)";
+            case "public":
+                return "Enter public key (130 hex characters)";
+            case "eth":
+                return "Enter Ethereum address (0x...)";
+            case "rev":
+                return `Enter ${getAddressLabel()}`;
+            default:
+                return "Enter value";
+        }
+    };
+
+    const handleCreateAccount = () => {
+        const trimmedName = newAccountName.trim();
+        const validation = validateAccountName(trimmedName);
+
+        if (!validation.isValid) {
+            setNewAccountNameError(validation.error || "Invalid account name");
+            return;
+        }
+
+        setNewAccountNameError("");
+        setPendingAccountName(trimmedName);
+        setShowPasswordSetup(true);
+    };
+
     const handleImportAccount = () => {
         const trimmedName = newAccountName.trim();
         const trimmedValue = importValue.trim();
@@ -422,21 +449,6 @@ export const Accounts: React.FC = () => {
         }
     };
 
-    const getImportPlaceholder = () => {
-        switch (importType) {
-            case "private":
-                return "Enter private key (64 hex characters)";
-            case "public":
-                return "Enter public key (130 hex characters)";
-            case "eth":
-                return "Enter Ethereum address (0x...)";
-            case "rev":
-                return `Enter ${getAddressLabel()}`;
-            default:
-                return "Enter value";
-        }
-    };
-
     if (showPasswordSetup) {
         return (
             <AccountsContainer>
@@ -493,80 +505,46 @@ export const Accounts: React.FC = () => {
     }
 
     return (
-        <AccountsContainer>
-            {successMessage && (
-                <SuccessMessage>
-                    <span className="icon">✅</span>
-                    <span>{successMessage}</span>
-                </SuccessMessage>
-            )}
+        <Fragment>
+            <AccountsContainer>
+                {successMessage && (
+                    <SuccessMessage>
+                        <span className="icon">✅</span>
+                        <span>{successMessage}</span>
+                    </SuccessMessage>
+                )}
 
-            {/* Show existing accounts first when they exist */}
-            {filteredAccounts.length > 0 && (
-                <Card style={{ marginBottom: "32px" }}>
-                    <CardHeader>
-                        <CardTitle>
-                            <h1>Your Accounts ({filteredAccounts.length})</h1>
-                        </CardTitle>
-                        <Button
-                            variant="icon-button-ghost"
-                            onClick={handleRefreshBalances}
-                            loading={isLoading}
-                        >
-                            <ReloadIcon />
-                        </Button>
-                    </CardHeader>
-                    <CardContent>
-                        <AccountsGrid className="accounts-grid">
-                            {filteredAccounts.map((account: Account) => (
-                                <AccountCard key={account.id} account={account} />
-                            ))}
-                        </AccountsGrid>
-                    </CardContent>
-                </Card>
-            )}
-
-            {/* Create/Import section below existing accounts */}
-            <FormContainer>
-                <CreateAccountSection>
-                    <Card>
+                {/* Show existing accounts first when they exist */}
+                {filteredAccounts.length > 0 && (
+                    <Card style={{ marginBottom: "32px" }}>
                         <CardHeader>
                             <CardTitle>
-                                <h1>Welcome!</h1>
+                                <h1>
+                                    Your Accounts ({filteredAccounts.length})
+                                </h1>
                             </CardTitle>
+                            <Button
+                                variant="icon-button-ghost"
+                                onClick={handleRefreshBalances}
+                                loading={isLoading}
+                            >
+                                <ReloadIcon />
+                            </Button>
                         </CardHeader>
                         <CardContent>
-                            {hasAccounts && !isAuthenticated && (
-                                <WarningMessage>
-                                    <span className="icon">⚠️</span>
-                                    <span>
-                                        You have existing accounts. Creating a
-                                        new account will not automatically log
-                                        you in. You'll need to unlock your
-                                        existing accounts with your password.
-                                    </span>
-                                </WarningMessage>
-                            )}
-                            <Input
-                                id="create-account-name-input"
-                                className="create-account-name-input text-3"
-                                label="Account Name"
-                                value={newAccountName}
-                                onChange={(e) => {
-                                    setNewAccountName(e.target.value);
-                                    if (newAccountNameError) {
-                                        setNewAccountNameError("");
-                                    }
-                                }}
-                                placeholder="Enter account name (max 30 characters)"
-                                error={newAccountNameError}
-                                maxLength={30}
-                            />
-                            <ActionButtons>
+                            <AccountsGrid className="accounts-grid">
+                                {filteredAccounts.map((account: Account) => (
+                                    <AccountCard
+                                        key={account.id}
+                                        account={account}
+                                    />
+                                ))}
+                            </AccountsGrid>
+                            {/* Create/Import section below existing accounts */}
+                            <AccountsActionsFooter>
                                 <Button
                                     id="create-account-button"
-                                    onClick={handleCreateAccount}
-                                    disabled={!newAccountName.trim()}
+                                    onClick={() => setShowCreateModal(true)}
                                     fullWidth={false}
                                 >
                                     <h3>Create Account </h3>
@@ -586,8 +564,7 @@ export const Accounts: React.FC = () => {
                                 <Button
                                     id="import-account-button"
                                     variant="secondary"
-                                    onClick={handleImportAccount}
-                                    disabled={!newAccountName.trim()}
+                                    onClick={() => setShowImportModal(true)}
                                     fullWidth={false}
                                 >
                                     <h3>Import Account</h3>
@@ -615,11 +592,30 @@ export const Accounts: React.FC = () => {
                                         </defs>
                                     </svg>
                                 </Button>
-                            </ActionButtons>
+                            </AccountsActionsFooter>
                         </CardContent>
                     </Card>
-                </CreateAccountSection>
-            </FormContainer>
-        </AccountsContainer>
+                )}
+            </AccountsContainer>
+            <CreateAccountModal
+                isOpen={showCreateModal}
+                hasExistingAccounts={hasAccounts}
+                isAuthenticated={isAuthenticated}
+                selectedNetworkId={selectedNetworkId}
+                onClose={() => setShowCreateModal(false)}
+                onSuccess={() => {
+                    console.log("Account created successfully");
+                }}
+            />
+
+            <ImportAccountModal
+                isOpen={showImportModal}
+                selectedNetworkId={selectedNetworkId}
+                onClose={() => setShowImportModal(false)}
+                onSuccess={() => {
+                    console.log("Account imported successfully");
+                }}
+            />
+        </Fragment>
     );
 };

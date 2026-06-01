@@ -22,7 +22,7 @@ import {
 } from "components/Icons";
 import { useNavigate } from "react-router-dom";
 import { buildUrlWithParams } from "utils/navigationUtils";
-import { EditableLabel } from "components/EditableLabel/EditableLabel";
+import { EditableLabel } from "components/EditableLabel";
 
 interface IAccountCardProps {
     account: Account;
