@@ -1168,6 +1168,8 @@ const DeployProModeBoard: React.FC = () => {
         toggleFolder,
     } = useDeployProMode();
 
+    const { isLaptop } = useScreen();
+
     const renderFileTree = (
         parentId?: string,
         depth = 0,
@@ -1413,7 +1415,7 @@ const DeployProModeBoard: React.FC = () => {
                         <h3>Explore</h3>
                     </Button>
                     <Button variant="ghost" size="small" onClick={clearConsole}>
-                        <h3 className="text-danger">Clear</h3>
+                        {!isLaptop && <h3 className="text-danger">Clear</h3>}
                         <DeleteIcon />
                     </Button>
                 </DeploySettings>
