@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled, { DefaultTheme } from "styled-components";
@@ -26,6 +26,7 @@ import {
     QRIconSecond,
 } from "components/Icons";
 import { Panel } from "components/Panel";
+import useScreen from "hooks/useScreen";
 
 const ReceiveContainer = styled.div`
     max-width: 600px;
@@ -117,6 +118,10 @@ const SelectToolbar = styled.div`
     gap: 24px;
 
     margin-bottom: 36px;
+
+    @media (max-width: 768px) {
+        display: block;
+    }
 `;
 
 const FilterGroup = styled.div`
@@ -135,10 +140,6 @@ const BalanceInfo = styled.div`
     margin-bottom: 36px;
     display: flex;
     justify-content: center;
-
-    @media (max-width: 768px) {
-        margin-bottom: 49px;
-    }
 `;
 
 const ActionsToolbar = styled.div`
@@ -172,6 +173,9 @@ export const Receive: React.FC = () => {
     const { selectedAccount, selectedNetwork } = useSelector(
         (state: RootState) => state.wallet,
     );
+
+    const { isLaptop } = useScreen();
+
     const [addressFormat, setAddressFormat] = useState<AddressFormats>(
         AddressFormats.ASI,
     );
@@ -183,6 +187,14 @@ export const Receive: React.FC = () => {
             setTimeout(() => setCopyMessage(""), 3000);
         });
     };
+
+    const accountSelectorStyle = useMemo(
+        () => ({
+            flex: 1,
+            ...(isLaptop && { marginBottom: "16px" }),
+        }),
+        [isLaptop],
+    );
 
     if (!selectedAccount) {
         return (
@@ -206,6 +218,8 @@ export const Receive: React.FC = () => {
     const addressLabel =
         addressFormat === AddressFormats.ASI ? "ASI Address" : "ETH Address";
 
+    console.log("IS LAPTOP: ", isLaptop);
+
     return (
         <ReceiveContainer>
             <Card>
@@ -220,14 +234,14 @@ export const Receive: React.FC = () => {
                     )}
 
                     <SelectToolbar>
-                        <AccountSelector wrapperStyle={{ flex: 1 }} />
+                        <AccountSelector wrapperStyle={accountSelectorStyle} />
                         <FilterGroup style={{ flex: 1 }}>
                             <FilterLabel>
                                 <h4 className="light">Address Format</h4>
                             </FilterLabel>
                             <Select
                                 id="address-format-account-select"
-                                value={selectedAccount?.id}
+                                value={addressFormat}
                                 onChange={(format) => {
                                     setAddressFormat(format as AddressFormats);
                                 }}
@@ -321,45 +335,107 @@ export const Receive: React.FC = () => {
                         </InfoList>
                     </InfoBox>
 
-                    <ActionsToolbar>
-                        <CopyButton
-                            variant="primary"
-                            onClick={() => copyToClipboard(currentAddress)}
-                            style={{
-                                marginTop: "0",
-                            }}
-                        >
-                            <h3>Copy {addressLabel}</h3>
-                            <CopyIcon size={24} color="currentColor" />
-                        </CopyButton>
+                    {!isLaptop && (
+                        <ActionsToolbar>
+                            <CopyButton
+                                variant="primary"
+                                onClick={() => copyToClipboard(currentAddress)}
+                                style={{
+                                    marginTop: "0",
+                                }}
+                            >
+                                <h3>Copy {addressLabel}</h3>
+                                <CopyIcon size={24} color="currentColor" />
+                            </CopyButton>
 
-                        <Button
-                            variant="secondary"
-                            onClick={() => {
-                                const canvas = document.querySelector("canvas");
-                                if (canvas) {
-                                    const url = canvas.toDataURL("image/png");
-                                    const link = document.createElement("a");
-                                    link.download = `${addressLabel
-                                        .toLowerCase()
-                                        .replace(" ", "-")}-address-qr.png`;
-                                    link.href = url;
-                                    link.click();
-                                }
-                            }}
-                        >
-                            <h3>Download QR</h3>
-                            <QRIconSecond size={24} color="currentColor" />
-                        </Button>
-                        <Button
-                            id="history-button"
-                            onClick={() => {}}
-                            variant="icon-button-black"
-                            fullWidth={false}
-                        >
-                            <HistoryIcon />
-                        </Button>
-                    </ActionsToolbar>
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    const canvas =
+                                        document.querySelector("canvas");
+                                    if (canvas) {
+                                        const url =
+                                            canvas.toDataURL("image/png");
+                                        const link =
+                                            document.createElement("a");
+                                        link.download = `${addressLabel
+                                            .toLowerCase()
+                                            .replace(" ", "-")}-address-qr.png`;
+                                        link.href = url;
+                                        link.click();
+                                    }
+                                }}
+                            >
+                                <h3>Download QR</h3>
+                                <QRIconSecond size={24} color="currentColor" />
+                            </Button>
+                            <Button
+                                id="history-button"
+                                onClick={() => {}}
+                                variant="icon-button-black"
+                                fullWidth={false}
+                            >
+                                <HistoryIcon />
+                            </Button>
+                        </ActionsToolbar>
+                    )}
+                    {isLaptop && (
+                        <Fragment>
+                            <ActionsToolbar style={{ marginBottom: "16px" }}>
+                                <CopyButton
+                                    variant="primary"
+                                    onClick={() =>
+                                        copyToClipboard(currentAddress)
+                                    }
+                                    style={{
+                                        marginTop: "0",
+                                    }}
+                                    fullWidth
+                                >
+                                    <h3>Copy {addressLabel}</h3>
+                                    <CopyIcon size={24} color="currentColor" />
+                                </CopyButton>
+                                <Button
+                                    id="history-button"
+                                    onClick={() => {}}
+                                    variant="icon-button-black"
+                                    fullWidth={false}
+                                >
+                                    <HistoryIcon />
+                                </Button>
+                            </ActionsToolbar>
+                            <ActionsToolbar>
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => {
+                                        const canvas =
+                                            document.querySelector("canvas");
+                                        if (canvas) {
+                                            const url =
+                                                canvas.toDataURL("image/png");
+                                            const link =
+                                                document.createElement("a");
+                                            link.download = `${addressLabel
+                                                .toLowerCase()
+                                                .replace(
+                                                    " ",
+                                                    "-",
+                                                )}-address-qr.png`;
+                                            link.href = url;
+                                            link.click();
+                                        }
+                                    }}
+                                    fullWidth
+                                >
+                                    <h3>Download QR</h3>
+                                    <QRIconSecond
+                                        size={24}
+                                        color="currentColor"
+                                    />
+                                </Button>
+                            </ActionsToolbar>
+                        </Fragment>
+                    )}
                 </CardContent>
             </Card>
         </ReceiveContainer>
