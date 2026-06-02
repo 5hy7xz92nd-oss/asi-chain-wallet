@@ -24,7 +24,7 @@ const EditableContainer = styled.div`
 
 const LabelDisplay = styled.span<{ isSelected: boolean; disabled?: boolean }>`
     cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-    font-size: 1.25rem !important;
+    font-size: 20px !important;
     font-weight: 400;
     color: ${({ isSelected, theme }) =>
         !isSelected
@@ -61,42 +61,42 @@ const EditButton = styled.button<{ isSelected: boolean }>`
     }
 `;
 
-const StyledInput = styled(Input)`
+const InlineEditableInput = styled(Input)`
     & > div {
-        margin-bottom: 0 !important;
-        width: auto !important;
-        display: inline-block !important;
+        margin-bottom: 0;
+        width: auto;
+        display: inline-block;
     }
 
     & > div > label {
-        display: none !important;
+        display: none;
     }
 
     & input {
-        padding: 0 !important;
-        margin: 0 !important;
-        border: none !important;
-        background: transparent !important;
-        min-height: auto !important;
-        font-size: inherit !important;
-        font-weight: inherit !important;
-        font-family: inherit !important;
-        color: inherit !important;
-        border-radius: 0 !important;
-        outline: none !important;
-        box-shadow: none !important;
-        width: auto !important;
+        padding: 0;
+        margin: 0;
+        border: none;
+        background: transparent;
+        min-height: auto;
+        font-size: inherit;
+        font-weight: inherit;
+        font-family: inherit;
+        color: inherit;
+        border-radius: 0;
+        outline: none;
+        box-shadow: none;
+        width: auto;
         min-width: 100px;
         margin-bottom: 0;
 
         &:focus {
-            outline: none !important;
-            border: none !important;
-            box-shadow: none !important;
+            outline: none;
+            border: none;
+            box-shadow: none;
         }
 
         &:hover {
-            border: none !important;
+            border: none;
         }
 
         &::placeholder {
@@ -106,7 +106,7 @@ const StyledInput = styled(Input)`
     }
 
     & > div > span:last-child {
-        display: none !important;
+        display: none;
     }
 `;
 
@@ -179,7 +179,7 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
 
     if (isEditing && !disabled) {
         return (
-            <StyledInput
+            <InlineEditableInput
                 inputRef={inputRef}
                 value={value}
                 onChange={handleInputChange}
