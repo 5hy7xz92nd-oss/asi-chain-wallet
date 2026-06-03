@@ -15,7 +15,7 @@ export interface EditableLabelProps extends Omit<
     "onChange" | "ref" | "labelStyle" | "onClick"
 > {
     label: string;
-    onChange: (newLabel: string) => void;
+    onSave: (newLabel: string) => void;
     disabled?: boolean;
     placeholder?: string;
     inputSize?: "small" | "medium" | "large";
@@ -24,6 +24,9 @@ export interface EditableLabelProps extends Omit<
     inputClassName?: string;
     "data-testid"?: string;
     isSelected?: boolean;
+    isValid?: boolean;
+    errorMessage?: string;
+    onChange?: (newLabel: string) => void;
 }
 
 const EditableContainer = styled.div`
@@ -128,9 +131,11 @@ const InlineEditableInput = styled(Input)<{ isSelected: boolean }>`
     }
 `;
 
+const DEFAULT_ERROR_MESSAGE: string = "Invalid value";
+
 export const EditableLabel: React.FC<EditableLabelProps> = ({
     label,
-    onChange,
+    onSave,
     disabled = false,
     placeholder = "Enter value",
     "data-testid": dataTestId,
@@ -138,6 +143,9 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
     inputClassName,
     isSelected = true,
     labelStyle,
+    errorMessage,
+    isValid = true,
+    onChange,
     ...props
 }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -158,9 +166,13 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
     };
 
     const handleSave = () => {
-        if (value.trim() && value !== label) {
-            onChange(value.trim());
+        if (!value.trim() || value === label) {
+            setIsEditing(false);
+
+            return;
         }
+
+        onSave(value.trim());
         setIsEditing(false);
     };
 
@@ -169,12 +181,20 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
         setIsEditing(false);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            handleSave();
-        } else if (e.key === "Escape") {
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Escape") {
             handleCancel();
         }
+
+        if (!isValid) {
+            return;
+        }
+
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        handleSave();
     };
 
     const handleClick = (event: MouseEvent<HTMLInputElement>): void => {
@@ -182,11 +202,17 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
     };
 
     const handleBlur = () => {
-        handleSave();
+        handleCancel();
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(event.target.value);
+
+        if (!onChange) {
+            return;
+        }
+
+        onChange(event.target.value);
     };
 
     const { style, className: propsInputClassname, ...otherProps } = props;
@@ -199,6 +225,11 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
         outline: "none",
         minHeight: "auto",
     };
+
+    const currentErrorMessage: string = errorMessage ?? DEFAULT_ERROR_MESSAGE;
+    const currentError: string | undefined = !isValid
+        ? currentErrorMessage
+        : undefined;
 
     if (isEditing && !disabled) {
         return (
@@ -217,6 +248,7 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
                 wrapperStyle={{ marginBottom: "0" }}
                 className={`inline-editable-input ${inputClassName} ${propsInputClassname}`}
                 withoutHoverUI
+                error={currentError}
                 {...otherProps}
             />
         );

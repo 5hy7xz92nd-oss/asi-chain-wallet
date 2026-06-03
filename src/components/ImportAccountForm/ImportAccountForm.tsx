@@ -13,7 +13,7 @@ import {
     importRevAddress,
 } from "utils/crypto";
 import { RootState } from "store";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
 
 const ImportTypeSelector = styled.select`
     padding: 12px 16px;

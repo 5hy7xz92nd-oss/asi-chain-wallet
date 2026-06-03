@@ -9,7 +9,8 @@ import { AccountCard } from "components/AccountCard";
 import { Account } from "types/wallet";
 import { CreateAccountModal } from "components/CreateAccountModal";
 import { ImportAccountModal } from "components/ImportAccountModal";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
+
 import { FirstAccountCreatingWidget } from "components/FirstAccountCreatingWidget";
 
 const AccountsContainer = styled.div``;

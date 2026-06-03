@@ -7,7 +7,7 @@ import { SecureStorage } from "services/secureStorage";
 import { getGasFeeAsNumber } from "../../constants/gas";
 import { Button, DeploymentConfirmationModal } from "components";
 import { DeleteIcon, PreviewIcon } from "components/Icons";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
 
 const PENDING_TRANSACTIONS_KEY = "asi_wallet_pending_transactions";
 

@@ -1088,7 +1088,8 @@ const walletSlice = createSlice({
 });
 
 export const selectAccountById = (state: RootState, accountId: string) =>
-    state.wallet.accounts.find((account) => account.id === accountId);
+    state.wallet.accounts.find((account: Account) => account.id === accountId);
+export const selectAccounts = (state: RootState) => state.wallet.accounts;
 
 export const {
     syncAccounts,

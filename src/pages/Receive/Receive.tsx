@@ -20,13 +20,11 @@ import { AccountBalance } from "components/AccountBalance";
 import {
     CopyIcon,
     FileCopyIcon,
-    FileIcon,
     HistoryIcon,
-    QRIcon,
     QRIconSecond,
 } from "components/Icons";
 import { Panel } from "components/Panel";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
 
 const ReceiveContainer = styled.div`
     max-width: 600px;

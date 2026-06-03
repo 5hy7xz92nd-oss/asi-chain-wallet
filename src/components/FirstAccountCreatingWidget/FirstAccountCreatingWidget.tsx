@@ -11,7 +11,7 @@ import {
 import { CreateAccountForm } from "components/CreateAccountForm";
 import { ImportAccountForm } from "components/ImportAccountForm";
 import { DefaultTheme } from "styled-components/dist/types";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
 
 const WidgetContainer = styled.div`
     width: 100%;

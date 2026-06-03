@@ -15,7 +15,7 @@ import { Select } from "components/Select";
 import { ISelectOption } from "components/Select/Select";
 import { DeployLiteModeWidget } from "components/DeployLiteModeWidget";
 import { DeployProModeWidget } from "components/DeployProModeWidget";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
 
 const DeployContainer = styled.div``;
 

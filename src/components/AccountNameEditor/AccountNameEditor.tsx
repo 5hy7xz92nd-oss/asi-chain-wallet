@@ -6,10 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Account } from "types/wallet";
 import { RootState } from "store";
 import { EditableLabelProps } from "components/EditableLabel/EditableLabel";
+import { useValidAccountUpdating } from "hooks";
 
 interface IAccountNameEditorProps extends Omit<
     EditableLabelProps,
-    "label" | "onChange"
+    "label" | "onChange" | "onSave"
 > {
     accountId: string;
 }
@@ -44,10 +45,12 @@ export const AccountNameEditor: React.FC<IAccountNameEditorProps> = ({
     const dispatch = useDispatch();
 
     const { selectedAccount } = useSelector((state: RootState) => state.wallet);
-
     const account: Account | undefined = useSelector((state: RootState) =>
         selectAccountById(state, accountId),
     );
+
+    const { isNameUpdateValid, updateAccountField } =
+        useValidAccountUpdating(account);
 
     if (!account) {
         return null;
@@ -68,13 +71,16 @@ export const AccountNameEditor: React.FC<IAccountNameEditorProps> = ({
         <StyledEditableLabel
             className={`account-name-editor`}
             label={account.name}
-            onChange={handleUpdateAccountName}
+            onSave={handleUpdateAccountName}
+            onChange={(query: string) => updateAccountField("name", query)}
+            isValid={isNameUpdateValid}
             isSelected={isSelected}
             labelStyle={{
                 maxWidth: "100%",
                 textWrap: "nowrap",
                 textOverflow: "ellipsis",
             }}
+            errorMessage="Account with this name already exist"
             style={{
                 maxWidth: "100%",
             }}
