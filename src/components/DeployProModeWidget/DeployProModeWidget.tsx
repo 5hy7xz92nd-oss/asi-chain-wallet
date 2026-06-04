@@ -1089,12 +1089,17 @@ const DeployProModeWidgetRoot: React.FC<DeployProModeWidgetProps> = ({
     );
 };
 
+const defaultButtonStyle: CSSProperties = {
+    height: "44px",
+    whiteSpace: "nowrap",
+};
+
 const DeployProModeActions: React.FC = () => {
     const { items, workspaceInputRef } = useDeployProMode();
     const { isTablet } = useScreen();
 
-    const adaptiveButtonStyle: CSSProperties = useMemo(
-        () => (!isTablet ? {} : { fontSize: "16px" }),
+    const adaptiveButtonLabelStyle: CSSProperties = useMemo(
+        () => (!isTablet ? {} : { fontSize: "0.875rem" }),
         [isTablet],
     );
 
@@ -1102,19 +1107,19 @@ const DeployProModeActions: React.FC = () => {
         <ToolbarActions>
             <Button
                 id="ide-import-workspace-button"
-                style={adaptiveButtonStyle}
+                style={defaultButtonStyle}
                 fullWidth={isTablet}
                 onClick={() => workspaceInputRef.current?.click()}
             >
-                <h3>Import Workspace</h3>
+                <h3 style={adaptiveButtonLabelStyle}>Import Workspace</h3>
             </Button>
             <Button
                 id="ide-export-workspace-button"
-                style={adaptiveButtonStyle}
+                style={defaultButtonStyle}
                 fullWidth={isTablet}
                 onClick={() => IDEStorageService.exportWorkspace(items)}
             >
-                <h3>Export Workspace</h3>
+                <h3 style={adaptiveButtonLabelStyle}>Export Workspace</h3>
             </Button>
         </ToolbarActions>
     );

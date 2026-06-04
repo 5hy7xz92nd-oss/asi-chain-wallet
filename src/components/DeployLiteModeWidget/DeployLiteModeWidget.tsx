@@ -476,7 +476,11 @@ const DeployLiteModeActions: React.FC = () => {
 
     return (
         <FormRow>
-            <Button fullWidth={isTablet} onClick={loadExample}>
+            <Button
+                style={{ height: "44px", whiteSpace: "nowrap" }}
+                fullWidth={isTablet}
+                onClick={loadExample}
+            >
                 <h3>Load Example</h3>
             </Button>
         </FormRow>
