@@ -364,14 +364,6 @@ const FileInput = styled.input`
     display: none;
 `;
 
-const ClearButton = styled(Button)`
-    font-size: 0.75rem;
-
-    $:hover {
-        border-color: ${({ theme }) => theme.danger} !important;
-    }
-`;
-
 interface ConsoleMessage {
     id: string;
     type: "info" | "error" | "success";
@@ -1429,15 +1421,22 @@ const DeployProModeBoard: React.FC = () => {
                     >
                         <h3>Explore</h3>
                     </Button>
-                    <ClearButton
+                    <Button
                         variant="ghost"
                         size="small"
                         onClick={clearConsole}
                         dangerHover
                     >
-                        {!isLaptop && <h3 className="text-danger">Clear</h3>}
+                        {!isLaptop && (
+                            <h3
+                                style={{ fontSize: "0.75rem" }}
+                                className="text-danger"
+                            >
+                                Clear
+                            </h3>
+                        )}
                         <DeleteIcon />
-                    </ClearButton>
+                    </Button>
                 </DeploySettings>
             </Toolbar>
 
