@@ -1,10 +1,9 @@
 import styled from "styled-components";
 import { removeAccount, selectAccounts } from "store/walletSlice";
+import { logout, setHasAccounts } from "store/authSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { DeleteIcon } from "components/Icons";
 import { Button } from "components/Button";
-import { logout } from "store/authSlice";
 import { Account } from "types/wallet";
 import { ReactElement } from "react";
 import { ButtonProps } from "components/Button/Button";
@@ -21,7 +20,6 @@ export const RemoveAccountButton = ({
     account,
 }: IRemoveAccountButtonProps): ReactElement => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const accounts: Account[] = useSelector(selectAccounts);
 
@@ -31,8 +29,8 @@ export const RemoveAccountButton = ({
         }
 
         if (accounts.length === 1) {
+            dispatch(setHasAccounts(false));
             dispatch(logout());
-            navigate("/login");
         }
     };
 
