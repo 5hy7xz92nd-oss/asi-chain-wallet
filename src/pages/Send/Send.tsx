@@ -1056,7 +1056,7 @@ export const Send: React.FC = () => {
                             <VectorIcon />
                         </Button>
                         <Button
-                            variant="ghost"
+                            variant="secondary"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleClearAll();
@@ -1072,6 +1072,7 @@ export const Send: React.FC = () => {
                             }}
                             variant="icon-button-black"
                             fullWidth={false}
+                            secondaryHover
                         >
                             <HistoryIcon />
                         </Button>

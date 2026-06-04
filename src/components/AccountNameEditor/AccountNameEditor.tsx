@@ -15,11 +15,11 @@ interface IAccountNameEditorProps extends Omit<
     accountId: string;
 }
 
-const StyledEditableLabel = styled(EditableLabel)<{ isSelected: boolean }>`
+const StyledEditableLabel = styled(EditableLabel)<{ $isSelected: boolean }>`
     font-size: 1.25rem !important;
     font-weight: 400 !important;
-    color: ${({ isSelected, theme }) =>
-        !isSelected
+    color: ${({ $isSelected, theme }) =>
+        !$isSelected
             ? theme.text.primary
             : theme.colors.background.secondary} !important;
     margin: 0;
@@ -67,6 +67,10 @@ export const AccountNameEditor: React.FC<IAccountNameEditorProps> = ({
 
     const isSelected: boolean = account.id === selectedAccount?.id;
 
+    if (account.name === "Artem") {
+        console.log("IS SELECTED: ", isSelected);
+    }
+
     return (
         <StyledEditableLabel
             className={`account-name-editor`}
@@ -75,7 +79,7 @@ export const AccountNameEditor: React.FC<IAccountNameEditorProps> = ({
             onChange={(query: string) => updateAccountField("name", query)}
             onCancel={reset}
             isValid={isNameUpdateValid}
-            isSelected={isSelected}
+            $isSelected={isSelected}
             labelStyle={{
                 maxWidth: "100%",
                 textWrap: "nowrap",
@@ -85,6 +89,7 @@ export const AccountNameEditor: React.FC<IAccountNameEditorProps> = ({
             style={{
                 maxWidth: "100%",
             }}
+            isSelected={isSelected}
             {...labelProps}
         />
     );

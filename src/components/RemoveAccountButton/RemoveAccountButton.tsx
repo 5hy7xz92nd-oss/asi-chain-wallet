@@ -6,8 +6,9 @@ import { DeleteIcon } from "components/Icons";
 import { Button } from "components/Button";
 import { Account } from "types/wallet";
 import { ReactElement } from "react";
+import { ButtonProps } from "components/Button/Button";
 
-interface IRemoveAccountButtonProps {
+interface IRemoveAccountButtonProps extends ButtonProps {
     account: Account;
 }
 
@@ -41,6 +42,7 @@ export const RemoveAccountButton = ({
                 e.stopPropagation();
                 handleRemoveAccount(account.id);
             }}
+            dangerHover
         >
             <DeleteIcon />
         </RemoveButton>
