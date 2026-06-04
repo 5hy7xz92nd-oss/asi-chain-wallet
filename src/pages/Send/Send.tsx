@@ -1042,7 +1042,7 @@ export const Send: React.FC = () => {
                         <Button
                             id="send-transaction-button"
                             onClick={handleSendClick}
-                            loading={isLoading}
+                            loading={true}
                             disabled={
                                 !recipient ||
                                 !amount ||
@@ -1056,7 +1056,7 @@ export const Send: React.FC = () => {
                             <VectorIcon />
                         </Button>
                         <Button
-                            variant="ghost"
+                            variant="secondary"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleClearAll();

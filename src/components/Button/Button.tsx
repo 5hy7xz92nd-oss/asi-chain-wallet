@@ -228,7 +228,7 @@ const ButtonBase = styled.button.withConfig(
         }
     }}
 
-  ${({ loading }) =>
+  ${({ loading, variant, theme }) =>
         loading &&
         css`
             color: transparent;
@@ -241,8 +241,12 @@ const ButtonBase = styled.button.withConfig(
                 height: 20px;
                 margin: auto;
                 border: 3px solid transparent;
-                border-top-color: currentColor;
-                border-right-color: currentColor;
+                border-top-color: ${variant === "primary"
+                    ? theme.colors.background.secondary
+                    : theme.text.primary};
+                border-right-color: ${variant === "primary"
+                    ? theme.colors.background.secondary
+                    : theme.text.primary};
                 border-radius: 50%;
                 animation: spin 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)
                     infinite;
