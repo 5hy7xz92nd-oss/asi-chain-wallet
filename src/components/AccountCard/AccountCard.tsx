@@ -35,7 +35,6 @@ const AccountCardWrapper = styled(Card)<{ isSelected: boolean }>`
 
     &:hover {
         border-color: ${({ theme }) => theme.primary};
-        transform: translateY(-2px);
     }
 
     @media (max-width: 768px) {
