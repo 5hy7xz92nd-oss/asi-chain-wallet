@@ -9,7 +9,8 @@ import TransactionHistoryService from "../../services/transactionHistory";
 import { AccountCard } from "components/AccountCard";
 import { buildUrlWithParams } from "utils/navigationUtils";
 import { HistoryIcon, VectorIcon } from "components/Icons";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
+
 import { AccountSelector } from "components/AccountSelector";
 
 const DashboardContainer = styled.div`

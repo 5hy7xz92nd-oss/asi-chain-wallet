@@ -15,7 +15,7 @@ const DEFAULT_DEBOUNCE_IN_MILLISECONDS: number = 100;
 export const LAPTOP_SCREEN_WIDTH_IN_PIXELS: number = 768;
 export const TABLET_SCREEN_WIDTH_IN_PIXELS: number = 1023;
 
-function useScreen(
+export function useScreen(
     debounceMs: number = DEFAULT_DEBOUNCE_IN_MILLISECONDS,
 ): IUseScreenResponse {
     const [dimensions, setDimensions] = useState<IScreenDimensions>(() => ({
@@ -91,5 +91,3 @@ function useScreen(
         ...dimensions,
     };
 }
-
-export default useScreen;

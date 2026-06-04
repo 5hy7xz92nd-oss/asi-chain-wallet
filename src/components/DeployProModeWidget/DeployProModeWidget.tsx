@@ -38,7 +38,7 @@ import IDEStorageService, {
 } from "services/ideStorage";
 import { SecureStorage } from "services/secureStorage";
 import { getGasFeeAsNumber } from "../../constants/gas";
-import useScreen from "hooks/useScreen";
+import { useScreen } from "hooks/";
 
 const PENDING_TRANSACTIONS_KEY = "asi_wallet_pending_transactions";
 
