@@ -94,6 +94,8 @@ const StyledInput = styled.input<{
         cursor: not-allowed;
         background: ${({ theme }) => theme.inputBg};
     }
+
+    color-scheme: ${({ theme }) => theme.mode};
 `;
 
 const ErrorMessage = styled.span`
