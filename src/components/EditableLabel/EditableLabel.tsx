@@ -258,7 +258,7 @@ export const EditableLabel: React.FC<EditableLabelProps> = ({
     const { style, className: propsInputClassname, ...otherProps } = props;
 
     const fullStyle: CSSProperties = {
-        ...props.style,
+        ...style,
         background: "transparent",
         padding: "0",
         border: "none",

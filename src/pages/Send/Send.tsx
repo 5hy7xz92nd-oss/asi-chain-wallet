@@ -135,8 +135,8 @@ const LoadingMessage = styled.div`
     }
 `;
 
-const QRScannerModal = styled.div<{ isOpen: boolean }>`
-    display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+const QRScannerModal = styled.div<{ $isOpen: boolean }>`
+    display: ${({ $isOpen }) => ($isOpen ? "flex" : "none")};
     position: fixed;
     top: 0;
     left: 0;
@@ -374,7 +374,7 @@ export const Send: React.FC = () => {
     }, [showQRScanner]);
 
     // Handle paste from clipboard
-    const handlePasteImage = async () => {
+    const _handlePasteImage = async () => {
         try {
             setScanError("");
 
@@ -754,9 +754,7 @@ export const Send: React.FC = () => {
         <SendContainer>
             <Card style={{ paddingBottom: "36px" }}>
                 <CardHeader>
-                    <CardTitle>
-                        <h1>Send ASI</h1>
-                    </CardTitle>
+                    <CardTitle>Send ASI</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {txHash && !isWaitingForBalance && (
@@ -1081,7 +1079,7 @@ export const Send: React.FC = () => {
             </Card>
 
             {/* QR Scanner Modal */}
-            <QRScannerModal isOpen={showQRScanner}>
+            <QRScannerModal $isOpen={showQRScanner}>
                 <QRScannerContent>
                     <QRScannerHeader>
                         <QRScannerTitle>Scan QR Code</QRScannerTitle>

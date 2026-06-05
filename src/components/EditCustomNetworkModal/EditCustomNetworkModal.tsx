@@ -46,9 +46,7 @@ const ModalContent = styled.div`
     padding: 24px;
 `;
 
-const Title = styled.h3`
-    font-size: 20px;
-    font-weight: 600;
+const Title = styled.h1`
     color: ${({ theme }) => theme.text.primary};
     margin-bottom: 8px;
 `;
@@ -57,9 +55,8 @@ const ConfigSection = styled.div`
     margin-bottom: 36px;
 `;
 
-const ConfigTitle = styled.h3`
+const ConfigTitle = styled.h2`
     // font-size: 18px;
-    font-weight: 600;
     margin-bottom: 16px;
     color: ${({ theme }) => theme.text.primary};
 `;
@@ -177,7 +174,6 @@ interface EditCustomNetworkModalProps {
 export const EditCustomNetworkModal: React.FC<EditCustomNetworkModalProps> = ({
     isOpen,
     network,
-    isActive,
     onClose,
     onSave,
     loading = false,
@@ -264,9 +260,7 @@ export const EditCustomNetworkModal: React.FC<EditCustomNetworkModalProps> = ({
         <Overlay onClick={handleClose}>
             <ModalContainer onClick={(e) => e.stopPropagation()}>
                 <ModalContent>
-                    <Title>
-                        <h1>Edit Custom Network</h1>
-                    </Title>
+                    <Title>Edit Custom Network</Title>
                     <ConfigSection>
                         <Label>Network Name</Label>
                         <AutoWidthInput
@@ -279,9 +273,7 @@ export const EditCustomNetworkModal: React.FC<EditCustomNetworkModalProps> = ({
                     </ConfigSection>
 
                     <ConfigSection>
-                        <ConfigTitle>
-                            <h2>Validator Node</h2>
-                        </ConfigTitle>
+                        <ConfigTitle>Validator Node</ConfigTitle>
                         <FormRow>
                             <FormGroup>
                                 <Label>IP/Domain:</Label>
@@ -346,9 +338,7 @@ export const EditCustomNetworkModal: React.FC<EditCustomNetworkModalProps> = ({
                     </ConfigSection>
 
                     <ConfigSection>
-                        <ConfigTitle>
-                            <h2>Read-only Node</h2>
-                        </ConfigTitle>
+                        <ConfigTitle>Read-only Node</ConfigTitle>
                         <FormRow>
                             <FormGroup>
                                 <Label>IP/Domain:</Label>
