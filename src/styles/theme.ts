@@ -1,5 +1,7 @@
 // ASI Wallet Brand Guide v0.1 - Dark theme (default)
 export const darkTheme = {
+    mode: "dark",
+
     colors: {
         primary: "#93E27C",
         primaryDark: "#82C96D",
@@ -78,6 +80,8 @@ export const darkTheme = {
 
 // Light theme - ASI Wallet Brand Guide v0.1
 export const lightTheme = {
+    mode: "light",
+
     colors: {
         primary: "#5A9C4F",
         primaryDark: "#4A8240",
