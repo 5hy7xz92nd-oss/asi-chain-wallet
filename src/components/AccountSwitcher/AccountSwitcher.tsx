@@ -1,21 +1,36 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
-import styled from "styled-components";
+import React, {
+    useState,
+    useRef,
+    useEffect,
+    useMemo,
+    CSSProperties,
+} from "react";
+import styled, { css } from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "store";
 import { selectAccount, fetchBalance } from "store/walletSlice";
 import { truncateText } from "utils/textUtils";
 import { formatBalanceCompact } from "utils/balanceUtils";
 
-const SwitcherContainer = styled.div`
+const SwitcherContainer = styled.div<{ $fullWidth?: boolean }>`
     position: relative;
     display: inline-block;
+
+    ${({ $fullWidth }) =>
+        $fullWidth &&
+        css`
+            width: 100%;
+        `};
 `;
 
-const SwitcherButton = styled.button`
+const SwitcherButton = styled.button<{
+    $layout?: "horizontal" | "vertical";
+    $fullWidth: boolean;
+}>`
     display: flex;
     align-items: center;
     gap: 8px;
-    height: 30px;
+    height: ${({ $layout }) => ($layout === "vertical" ? "70px" : "30px")};
     padding: 0 12px;
     border: 1px solid ${({ theme }) => theme.border};
     border-radius: 6px;
@@ -26,10 +41,20 @@ const SwitcherButton = styled.button`
     min-width: 180px;
     max-width: 280px;
     text-align: left;
+    ${({ $layout }) =>
+        $layout &&
+        css`
+            padding: 7px;
+        `};
 
     @media (max-width: 768px) {
         min-width: 140px;
-        max-width: 220px;
+
+        ${({ $fullWidth }) =>
+            !$fullWidth &&
+            css`
+                max-width: 220px;
+            `};
     }
 
     &:hover {
@@ -41,14 +66,29 @@ const SwitcherButton = styled.button`
         outline: none;
         border-color: ${({ theme }) => theme.primary};
     }
+
+    ${({ $fullWidth }) =>
+        $fullWidth &&
+        css`
+            width: 100%;
+        `};
 `;
 
-const AccountInfo = styled.div`
+const AccountInfo = styled.div<{ $layout?: "horizontal" | "vertical" }>`
     flex: 1;
     display: flex;
     gap: 10px;
     align-items: center;
     overflow: hidden;
+
+    ${({ $layout }) =>
+        $layout === "vertical" &&
+        css`
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        `}
 `;
 
 const AccountName = styled.span`
@@ -64,25 +104,53 @@ const AccountName = styled.span`
     }
 `;
 
-const AccountAddress = styled.span`
+const AccountAddress = styled.span<{
+    $adaptive?: boolean;
+    $layout?: "horizontal" | "vertical";
+}>`
     font-size: 12px;
     color: ${({ theme }) => theme.text.primary};
 
-    @media (max-width: 1024px) {
-        display: none;
-    }
+    ${({ $adaptive }) =>
+        $adaptive &&
+        css`
+            @media (max-width: 1024px) {
+                display: none;
+            }
+        `}
+
+    ${({ $layout }) =>
+        $layout === "vertical" &&
+        css`
+            width: 100%;
+            word-break: break-all;
+        `}
 `;
 
-const AccountBalance = styled.span`
+const AccountBalance = styled.span<{
+    $adaptive?: boolean;
+    $layout?: "horizontal" | "vertical";
+}>`
     font-size: 12px;
     color: ${({ theme }) => theme.primary};
     font-weight: 500;
-    flex-shrink: 0; /* Prevent balance from shrinking */
+    flex-shrink: 0;
     white-space: nowrap;
 
-    @media (max-width: 1024px) {
-        display: none;
-    }
+    ${({ $adaptive }) =>
+        $adaptive &&
+        css`
+            @media (max-width: 1024px) {
+                display: none;
+            }
+        `}
+
+    ${({ $layout }) =>
+        $layout === "vertical" &&
+        css`
+            width: 100%;
+            white-space: normal;
+        `}
 `;
 
 const LoadingSpinner = styled.div`
@@ -106,9 +174,23 @@ const ChevronIcon = styled.span<{ $isOpen: boolean }>`
     transform: rotate(${({ $isOpen }) => ($isOpen ? "180deg" : "0deg")});
 `;
 
-const Dropdown = styled.div<{ $isOpen: boolean }>`
+const Dropdown = styled.div<{
+    $isOpen: boolean;
+    $listDirection?: "top" | "bottom";
+}>`
     position: absolute;
-    top: 100%;
+    ${({ $listDirection }) =>
+        $listDirection === "top"
+            ? css`
+                  bottom: 100%;
+                  top: auto;
+                  margin-bottom: 4px;
+              `
+            : css`
+                  top: 100%;
+                  bottom: auto;
+                  margin-top: 4px;
+              `}
     left: 0;
     right: 0;
     background: ${({ theme }) => theme.card};
@@ -119,10 +201,12 @@ const Dropdown = styled.div<{ $isOpen: boolean }>`
     max-height: 300px;
     overflow-y: auto;
     display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
-    margin-top: 4px;
 `;
 
-const DropdownItem = styled.button<{ $isSelected: boolean }>`
+const DropdownItem = styled.button<{
+    $isSelected: boolean;
+    $layout?: "horizontal" | "vertical";
+}>`
     width: 100%;
     display: flex;
     align-items: center;
@@ -135,6 +219,14 @@ const DropdownItem = styled.button<{ $isSelected: boolean }>`
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
+
+    ${({ $layout }) =>
+        $layout === "vertical" &&
+        css`
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        `}
 
     &:last-child {
         border-bottom: none;
@@ -160,16 +252,30 @@ const EmptyState = styled.div`
 const formatAddress = (address: string): string => {
     if (!address) return "";
     return `${address.substring(0, 8)}...${address.substring(
-        address.length - 6
+        address.length - 6,
     )}`;
 };
 
 // Remove the old formatBalance function since we're using the utility now
 
-export const AccountSwitcher: React.FC = () => {
+interface IAccountSwitcherProps {
+    adaptive?: boolean;
+    layout?: "horizontal" | "vertical";
+    fullWidth?: boolean;
+    listDirection?: "top" | "bottom";
+    wrapperStyle?: CSSProperties;
+}
+
+export const AccountSwitcher: React.FC<IAccountSwitcherProps> = ({
+    adaptive = true,
+    layout = "horizontal",
+    fullWidth = false,
+    listDirection = "bottom",
+    wrapperStyle,
+}: IAccountSwitcherProps) => {
     const dispatch = useDispatch();
     const { accounts, selectedAccount, selectedNetwork } = useSelector(
-        (state: RootState) => state.wallet
+        (state: RootState) => state.wallet,
     );
     const [isOpen, setIsOpen] = useState(false);
     const [isLoadingBalances, setIsLoadingBalances] = useState(false);
@@ -180,10 +286,10 @@ export const AccountSwitcher: React.FC = () => {
         () =>
             selectedNetworkId
                 ? accounts.filter(
-                      (account) => account.networkId === selectedNetworkId
+                      (account) => account.networkId === selectedNetworkId,
                   )
                 : accounts,
-        [accounts, selectedNetworkId]
+        [accounts, selectedNetworkId],
     );
 
     // Close dropdown when clicking outside
@@ -219,11 +325,13 @@ export const AccountSwitcher: React.FC = () => {
         setIsLoadingBalances(true);
 
         const balancePromises = filteredAccounts.map((account) =>
-            dispatch(fetchBalance({ 
-                account, 
-                network: selectedNetwork,
-                forceRefresh,
-            }) as any)
+            dispatch(
+                fetchBalance({
+                    account,
+                    network: selectedNetwork,
+                    forceRefresh,
+                }) as any,
+            ),
         );
 
         try {
@@ -237,6 +345,23 @@ export const AccountSwitcher: React.FC = () => {
 
     const handleToggle = () => {
         const newIsOpen = !isOpen;
+
+        if (newIsOpen && listDirection === "top") {
+            // Проверяем, что дропдаун не выходит за пределы viewport
+            setTimeout(() => {
+                if (containerRef.current) {
+                    const rect = containerRef.current.getBoundingClientRect();
+                    const dropdownHeight = 300; // max-height из стилей
+                    if (rect.top - dropdownHeight < 0) {
+                        // Если не хватает места сверху, можно автоматически переключить на bottom
+                        console.warn(
+                            "Not enough space above, consider using bottom",
+                        );
+                    }
+                }
+            }, 0);
+        }
+
         setIsOpen(newIsOpen);
 
         if (newIsOpen) {
@@ -260,13 +385,19 @@ export const AccountSwitcher: React.FC = () => {
     }
 
     return (
-        <SwitcherContainer ref={containerRef}>
+        <SwitcherContainer
+            style={wrapperStyle}
+            $fullWidth={fullWidth}
+            ref={containerRef}
+        >
             <SwitcherButton
+                $fullWidth={fullWidth}
                 id="header-account-switcher"
                 onClick={handleToggle}
                 onKeyDown={handleKeyDown}
+                $layout={layout}
             >
-                <AccountInfo>
+                <AccountInfo $layout={layout} className="account-info">
                     {selectedAccount ? (
                         <>
                             <AccountName
@@ -275,7 +406,7 @@ export const AccountSwitcher: React.FC = () => {
                             >
                                 {truncateText(selectedAccount.name, 20)}
                             </AccountName>
-                            <AccountAddress>
+                            <AccountAddress $adaptive={adaptive}>
                                 <div className="text-4">
                                     {formatAddress(selectedAccount.revAddress)}
                                 </div>
@@ -284,38 +415,56 @@ export const AccountSwitcher: React.FC = () => {
                     ) : (
                         <AccountName>Select Account</AccountName>
                     )}
+                    {selectedAccount && (
+                        <AccountBalance
+                            $adaptive={adaptive}
+                            id="header-account-balance"
+                        >
+                            <h5>
+                                {isLoadingBalances ? (
+                                    <LoadingSpinner />
+                                ) : (
+                                    formatBalanceCompact(
+                                        selectedAccount.balance,
+                                    )
+                                )}
+                            </h5>
+                        </AccountBalance>
+                    )}
                 </AccountInfo>
-                {selectedAccount && (
-                    <AccountBalance id="header-account-balance">
-                        <h5>
-                            {isLoadingBalances ? (
-                                <LoadingSpinner />
-                            ) : (
-                                formatBalanceCompact(selectedAccount.balance)
-                            )}
-                        </h5>
-                    </AccountBalance>
-                )}
                 <ChevronIcon $isOpen={isOpen}>▼</ChevronIcon>
             </SwitcherButton>
 
-            <Dropdown $isOpen={isOpen}>
+            <Dropdown $isOpen={isOpen} $listDirection={listDirection}>
                 {filteredAccounts.length > 0 ? (
                     filteredAccounts.map((account) => (
                         <DropdownItem
                             key={account.id}
                             $isSelected={selectedAccount?.id === account.id}
+                            $layout={layout}
                             onClick={() => handleAccountSelect(account.id)}
                         >
-                            <AccountInfo>
+                            <AccountInfo
+                                $layout={layout}
+                                className="account-info"
+                            >
                                 <AccountName title={account.name}>
-                                    {truncateText(account.name, 25)}
+                                    {truncateText(
+                                        account.name,
+                                        layout === "vertical" ? 35 : 25,
+                                    )}
                                 </AccountName>
-                                <AccountAddress>
+                                <AccountAddress
+                                    $adaptive={adaptive}
+                                    $layout={layout}
+                                >
                                     {formatAddress(account.revAddress)}
                                 </AccountAddress>
                             </AccountInfo>
-                            <AccountBalance>
+                            <AccountBalance
+                                $adaptive={adaptive}
+                                $layout={layout}
+                            >
                                 {isLoadingBalances ? (
                                     <LoadingSpinner />
                                 ) : (

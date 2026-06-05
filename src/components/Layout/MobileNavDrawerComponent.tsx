@@ -6,6 +6,7 @@ import { RootState } from "store";
 import { logout } from "store/authSlice";
 import { CloseIcon } from "components/Icons";
 import { Button } from "components/Button";
+import { AccountSwitcher } from "components/AccountSwitcher";
 
 const MobileNavDrawerStyled = styled.div<{ $isOpen: boolean }>`
     position: fixed;
@@ -59,7 +60,7 @@ const MobileNavSection = styled.div`
     /* margin-bottom: 24px; */
 `;
 
-const LogoutSection = styled.div`
+const MobileNavFooter = styled.div`
     padding: 25px;
     margin-top: auto;
 `;
@@ -184,7 +185,10 @@ export const MobileNavDrawerComponent: React.FC<
     return (
         <>
             <MobileNavOverlayStyled $isOpen={isOpen} onClick={onClose} />
-            <MobileNavDrawerStyled $isOpen={isOpen}>
+            <MobileNavDrawerStyled
+                className="mobile-nav-drawer-styled"
+                $isOpen={isOpen}
+            >
                 <MobileNavHeader>
                     <h2 style={{ margin: 0, fontSize: "18px" }}>Menu</h2>
                     <IconButton onClick={onClose}>
@@ -217,7 +221,14 @@ export const MobileNavDrawerComponent: React.FC<
                         ))}
                     </MobileNavSection>
                 </MobileNavContent>
-                <LogoutSection>
+                <MobileNavFooter>
+                    <AccountSwitcher
+                        adaptive={false}
+                        layout="vertical"
+                        fullWidth
+                        listDirection="top"
+                        wrapperStyle={{ marginBottom: "36px" }}
+                    />
                     {isAuthenticated && (
                         <LogoutButton
                             fullWidth
@@ -243,7 +254,7 @@ export const MobileNavDrawerComponent: React.FC<
                             </svg>
                         </LogoutButton>
                     )}
-                </LogoutSection>
+                </MobileNavFooter>
             </MobileNavDrawerStyled>
         </>
     );
