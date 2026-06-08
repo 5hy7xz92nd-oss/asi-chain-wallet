@@ -2,6 +2,7 @@ import "styled-components";
 
 declare module "styled-components" {
     export interface DefaultTheme {
+        mode: string;
         // Updated to support both old and new theme structure
         colors: {
             primary: string;
