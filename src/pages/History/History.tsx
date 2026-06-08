@@ -283,7 +283,7 @@ export const History: React.FC = () => {
             (account) => account.id === selectedAccount.id,
         );
     }, [unlockedAccounts, selectedAccount]);
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [htransactions, setTransactions] = useState<Transaction[]>([]);
     const [filter, setFilter] = useState<TransactionFilter>({});
     const [_stats, setStats] = useState<any>({});
     const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
@@ -624,7 +624,7 @@ export const History: React.FC = () => {
                                         </tr>
                                     </TableHeader>
                                     <TableBody>
-                                        {transactions.map((tx) => (
+                                        {transactions.map((tx: Transaction) => (
                                             <TableRow
                                                 key={tx.id}
                                                 id={`history-transaction-row-${tx.id}`}
