@@ -723,6 +723,7 @@ export const History: React.FC = () => {
                                                             …
                                                             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                                                             <a
+                                                                title="Copy Deploy ID"
                                                                 id={`copy-deployid-${tx.id}`}
                                                                 href="#"
                                                                 onClick={(

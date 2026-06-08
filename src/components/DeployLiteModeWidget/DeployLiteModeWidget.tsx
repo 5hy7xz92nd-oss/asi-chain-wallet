@@ -595,6 +595,7 @@ const DeployLiteModeBoard: React.FC = () => {
                         {!isLaptop && <PreviewIcon />}
                     </Button>
                     <Button
+                        title="Clear code editor"
                         variant={clearButtonVariant}
                         onClick={clearCode}
                         dangerHover

@@ -1422,6 +1422,7 @@ const DeployProModeBoard: React.FC = () => {
                         <h3>Explore</h3>
                     </Button>
                     <Button
+                        title="Clear console output"
                         variant="ghost"
                         size="small"
                         onClick={clearConsole}
