@@ -244,7 +244,7 @@ export const Accounts: React.FC = () => {
                 isOpen={showCreateModal}
                 onClose={() => setShowCreateModal(false)}
                 onSuccess={() => {
-                    console.log("Account created successfully");
+                    console.info("Account created successfully");
                 }}
             />
 
@@ -252,7 +252,7 @@ export const Accounts: React.FC = () => {
                 isOpen={showImportModal}
                 onClose={() => setShowImportModal(false)}
                 onSuccess={() => {
-                    console.log("Account imported successfully");
+                    console.info("Account imported successfully");
                 }}
             />
         </Fragment>
