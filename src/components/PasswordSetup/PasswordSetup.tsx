@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { validatePassword, PasswordValidation } from "utils/encryption";
-import { Input, Button } from "components";
+import { PasswordInput, Button } from "components";
 
 const Container = styled.div`
     max-width: 400px;
@@ -104,11 +104,10 @@ export const PasswordSetup: React.FC<PasswordSetupProps> = ({
         <Container>
             <Title>{title}</Title>
 
-            <Input
+            <PasswordInput
                 id="password-setup-password-input"
                 data-testid="password-setup-password-input"
                 data-cy="password-setup-password-input"
-                type="password"
                 label="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -143,11 +142,10 @@ export const PasswordSetup: React.FC<PasswordSetupProps> = ({
                 </ValidationList>
             )}
 
-            <Input
+            <PasswordInput
                 id="password-setup-confirm-input"
                 data-testid="password-setup-confirm-input"
                 data-cy="password-setup-confirm-input"
-                type="password"
                 label="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
