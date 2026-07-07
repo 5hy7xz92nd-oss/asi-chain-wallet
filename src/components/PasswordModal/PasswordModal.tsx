@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Input, Button } from 'components';
+import { PasswordInput, Button } from 'components';
 
 const Overlay = styled.div`
   position: fixed;
@@ -100,11 +100,10 @@ export const PasswordModal: React.FC<PasswordModalProps> = ({
         <Title>{title}</Title>
         <Description>{description}</Description>
         
-        <Input
+        <PasswordInput
           id="password-modal-input"
           data-testid="password-modal-input"
           data-cy="password-modal-input"
-          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onInput={(e) => {

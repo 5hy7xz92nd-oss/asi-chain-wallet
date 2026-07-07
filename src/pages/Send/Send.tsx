@@ -16,6 +16,7 @@ import {
     CardContent,
     Button,
     Input,
+    PasswordInput,
     TransactionConfirmationModal,
 } from "components";
 import { getTokenDisplayName } from "../../constants/token";
@@ -567,6 +568,12 @@ export const Send: React.FC = () => {
             return;
         }
 
+        if (isAccountUnlocked) {
+            setShowConfirmation(true);
+
+            return;
+        }
+
         try {
             await dispatch(
                 unlockAccount({ accountId: selectedAccount.id, password }),
@@ -1022,7 +1029,7 @@ export const Send: React.FC = () => {
 
                     {needsPassword && (
                         <FormGroup>
-                            <Input
+                            <PasswordInput
                                 id="send-password-input"
                                 data-testid="send-password-input"
                                 data-cy="send-password-input"
@@ -1031,7 +1038,6 @@ export const Send: React.FC = () => {
                                         ? "Transaction Password"
                                         : "Account Password"
                                 }
-                                type="password"
                                 value={password}
                                 onChange={(e) =>
                                     handlePasswordChange(e.target.value)
