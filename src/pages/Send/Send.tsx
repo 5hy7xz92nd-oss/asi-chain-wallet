@@ -567,6 +567,12 @@ export const Send: React.FC = () => {
             return;
         }
 
+        if (isAccountUnlocked) {
+            setShowConfirmation(true);
+
+            return;
+        }
+
         try {
             await dispatch(
                 unlockAccount({ accountId: selectedAccount.id, password }),
