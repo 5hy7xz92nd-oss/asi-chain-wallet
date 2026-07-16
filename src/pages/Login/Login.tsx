@@ -20,7 +20,7 @@ import {
     CardTitle,
     CardContent,
     Button,
-    Input,
+    PasswordInput,
 } from "components";
 import {
     buildContextKey,
@@ -466,11 +466,10 @@ export const Login: React.FC = () => {
                     )}
 
                     <FormGroup>
-                        <Input
+                        <PasswordInput
                             id="login-password-input"
                             data-testid="login-password-input"
                             data-cy="login-password-input"
-                            type="password"
                             label="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}

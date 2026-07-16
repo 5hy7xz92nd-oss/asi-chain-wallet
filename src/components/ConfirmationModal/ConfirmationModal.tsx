@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Button, Input } from "components";
+import { Button, PasswordInput } from "components";
 import { getTokenDisplayName } from "../../constants/token";
 import { useScreen } from "hooks";
 
@@ -229,7 +229,7 @@ export const TransactionConfirmationModal: React.FC<
 
                 {needsPassword && (
                     <div style={{ marginBottom: "24px" }}>
-                        <Input
+                        <PasswordInput
                             id="transaction-confirmation-password-input"
                             data-testid="transaction-confirmation-password-input"
                             data-cy="transaction-confirmation-password-input"
@@ -238,7 +238,6 @@ export const TransactionConfirmationModal: React.FC<
                                     ? "Transaction Password"
                                     : "Account Password"
                             }
-                            type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             onInput={(e) => {

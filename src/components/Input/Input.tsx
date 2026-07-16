@@ -18,13 +18,13 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     withoutHoverUI?: boolean;
 }
 
-const InputWrapper = styled.div<{ $fullWidth?: boolean }>`
+export const InputWrapper = styled.div<{ $fullWidth?: boolean }>`
     display: ${({ $fullWidth }) => ($fullWidth ? "block" : "inline-block")};
     width: ${({ $fullWidth }) => ($fullWidth ? "100%" : "auto")};
     margin-bottom: 16px;
 `;
 
-const Label = styled.label<{
+export const Label = styled.label<{
     $themeColorSelector?: (theme: DefaultTheme) => string;
 }>`
     display: block;
@@ -44,7 +44,7 @@ const Label = styled.label<{
     }
 `;
 
-const StyledInput = styled.input<{
+export const StyledInput = styled.input<{
     $hasError?: boolean;
     $copyable?: boolean;
     $withoutHoverUI?: boolean;
@@ -98,7 +98,7 @@ const StyledInput = styled.input<{
     color-scheme: ${({ theme }) => theme.mode};
 `;
 
-const ErrorMessage = styled.span`
+export const ErrorMessage = styled.span`
     display: block;
     font-size: 13px;
     line-height: 20px;
@@ -119,12 +119,12 @@ const ErrorMessage = styled.span`
     }
 `;
 
-const InputContainer = styled.div`
+export const InputContainer = styled.div`
     position: relative;
     width: 100%;
 `;
 
-const CopyButtonWrapper = styled.div`
+export const ActionButtonWrapper = styled.div`
     position: absolute;
     right: 20px;
     top: 50%;
@@ -270,7 +270,7 @@ export const Input: React.FC<InputProps> = ({
                     {...props}
                 />
                 {copyable && (
-                    <CopyButtonWrapper>
+                    <ActionButtonWrapper>
                         <CopyButton
                             dataToCopy={getValueToCopy()}
                             size={16}
@@ -285,7 +285,7 @@ export const Input: React.FC<InputProps> = ({
                             }}
                             disabled={!value}
                         />
-                    </CopyButtonWrapper>
+                    </ActionButtonWrapper>
                 )}
             </InputContainer>
             {error && <ErrorMessage>{error}</ErrorMessage>}
